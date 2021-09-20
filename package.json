@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/enfogroup/aws-secrets/issues"
   },
-  "homepage": "https://github.com/enfogroup/aws-secrets#readme"
+  "homepage": "https://github.com/enfogroup/aws-secrets#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0"
+  }
 }
