@@ -2,8 +2,9 @@
   "name": "@enfo/aws-secrets",
   "version": "0.0.1",
   "description": "Wrapper around AWS SSM",
-  "main": "index.js",
+  "main": ".dist/index.js",
   "scripts": {
+    "build": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify && tsc --emitDeclarationOnly --outDir .dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
