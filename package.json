@@ -39,5 +39,8 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "peerDependencies": {
+    "aws-sdk": "^2.991.0"
   }
 }
