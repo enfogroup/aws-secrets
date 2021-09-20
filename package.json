@@ -23,6 +23,12 @@
   "homepage": "https://github.com/enfogroup/aws-secrets#readme",
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0"
+    "@commitlint/config-conventional": "^13.1.0",
+    "husky": "^4.3.8"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }
