@@ -1,8 +1,6 @@
 import SSM from 'aws-sdk/clients/SSM';
 import { cache } from 'cache';
 
-const client = new SSM({ region: 'eu-west-1' });
-
 // eslint-disable-next-line prefer-const
 export let defaultRegion = 'eu-west-1';
 
@@ -31,10 +29,6 @@ interface GetParameterRequest {
    */
   region?: string;
 }
-
-export const getParameter = async (params: SSM.GetParameterRequest) => {
-  return client.getParameter(params).promise();
-};
 
 /**
  * Retrieves and caches a parameter from SSM
