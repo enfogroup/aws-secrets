@@ -1,1 +1,1 @@
-export { getSSMParameter } from './ssm';
+export { getSSMParameter, defaultRegion } from './ssm';
