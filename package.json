@@ -5,7 +5,9 @@
   "main": ".dist/index.js",
   "scripts": {
     "build": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify && tsc --emitDeclarationOnly --outDir .dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint 'src/**/*.ts'",
+    "lint:fix": "npx eslint -fix 'src/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -39,7 +41,8 @@
   },
   "husky": {
     "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "npm run lint"
     }
   },
   "peerDependencies": {
