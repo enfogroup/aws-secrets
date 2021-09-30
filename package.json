@@ -48,5 +48,8 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.991.0"
+  },
+  "dependencies": {
+    "node-cache": "^5.1.2"
   }
 }
