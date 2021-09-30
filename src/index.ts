@@ -1,1 +1,1 @@
-export * from './ssm';
+export { getSSMParameter } from './ssm';
