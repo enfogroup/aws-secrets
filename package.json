@@ -2,9 +2,12 @@
   "name": "@enfo/aws-secrets",
   "version": "0.0.1",
   "description": "Wrapper around AWS SSM",
-  "main": ".dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify && tsc --emitDeclarationOnly --outDir .dist",
+    "build": "npx npm-run-all build:esbuild emit:types copy:files",
+    "build:esbuild": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify",
+    "emit:types": "tsc --emitDeclarationOnly --outDir .dist",
+    "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint 'src/**/*.ts'",
     "lint:fix": "npx eslint -fix 'src/**/*.ts'"
@@ -38,6 +41,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^4.3.8",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.4.3"
   },
   "husky": {
