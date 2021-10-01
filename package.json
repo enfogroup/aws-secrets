@@ -8,6 +8,7 @@
     "build:esbuild": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify",
     "emit:types": "tsc --emitDeclarationOnly --outDir .dist",
     "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
+    "publish:package": "npm publish .dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint 'src/**/*.ts'",
     "lint:fix": "npx eslint -fix 'src/**/*.ts'"
