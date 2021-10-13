@@ -1,3 +1,4 @@
+// istanbul ignore file
 import SSM from 'aws-sdk/clients/SSM';
 
 const clients: Record<string, SSM> = {};
