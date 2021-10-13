@@ -1,12 +1,14 @@
 const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   context: __dirname,
   mode: 'production',
   entry: './src/index',
   devtool: 'cheap-source-map',
+  externals: [nodeExternals()],
   resolve: {
     extensions: ['.mjs', '.json', '.ts', 'js'],
     symlinks: false,
