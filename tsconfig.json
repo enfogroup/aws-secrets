@@ -20,6 +20,18 @@
     "outDir": ".dist",
     "baseUrl": "src",
     "paths": {
+      "@test/*": [
+        "../test/*"
+      ],
+      "@aws/*": [
+        "aws/*"
+      ],
+      "@clients/*": [
+        "clients/*"
+      ],
+      "@helpers/*": [
+        "helpers/*"
+      ]
     }
   },
   "include": [

@@ -2,7 +2,9 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   moduleNameMapper: {
-    '@src/(.*)$': '<rootDir>/src/$1'
+    '@helpers/(.*)$': '<rootDir>/src/helpers/$1',
+    '@aws/(.*)$': '<rootDir>/src/aws/$1',
+    '@test/(.*)$': '<rootDir>/test/$1'
   },
   testPathIgnorePatterns: [
     '/node_modules/'
