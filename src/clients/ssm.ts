@@ -58,8 +58,8 @@ export class SSMCache {
    * See interface definition
    */
   public async getParameter (params: GetParameterRequest): Promise<string> {
-    const { name, region = this.region, ttl = this.defaultTTL } = params;
-    const cachedValue = cache.get<string>(name);
+    const { name, region = this.region, ttl = this.defaultTTL, cacheKey = name } = params;
+    const cachedValue = cache.get<string>(cacheKey);
     if (cachedValue) {
       return cachedValue;
     }
@@ -68,7 +68,7 @@ export class SSMCache {
     if (!value) {
       throw new Error('No value found for parameter');
     }
-    cache.set<string>(name, value, ttl);
+    cache.set<string>(cacheKey, value, ttl);
     return value;
   }
 
