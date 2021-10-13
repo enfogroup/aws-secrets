@@ -1,13 +1,5 @@
-import SSM from 'aws-sdk/clients/SSM';
-import { cache } from './cache';
-
-const clients: Record<string, SSM> = {};
-const getClient = (region: string): SSM => {
-  if (!clients[region]) {
-    clients[region] = new SSM({ region });
-  }
-  return clients[region];
-};
+import { getClient } from '@aws/ssm';
+import { cache } from '@helpers/cache';
 
 /**
  * Parameters when getting a parameter

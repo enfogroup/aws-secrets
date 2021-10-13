@@ -1,1 +1,1 @@
-export { SSMCache } from './ssm';
+export { SSMCache } from '@clients/ssm';
