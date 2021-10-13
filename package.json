@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx npm-run-all build:esbuild emit:types copy:files",
     "build:esbuild": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify",
-    "emit:types": "tsc --emitDeclarationOnly --outDir .dist",
+    "emit:types": "tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir .dist --traceResolution",
     "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
     "publish:package": "npm publish .dist",
     "test": "npx jest --runInBand --config ./jest.config.js",
@@ -36,7 +36,6 @@
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "aws-sdk": "^2.997.0",
-    "esbuild": "^0.12.28",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.24.2",
