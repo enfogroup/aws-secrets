@@ -1,1 +1,1 @@
-export { getSSMParameter, defaultRegion } from './ssm';
+export { SSMCache } from './ssm';

@@ -1,11 +1,8 @@
 import SSM from 'aws-sdk/clients/SSM';
 import { cache } from './cache';
 
-// eslint-disable-next-line prefer-const
-export let defaultRegion = 'eu-west-1';
-
 const clients: Record<string, SSM> = {};
-const getClient = (region: string = defaultRegion): SSM => {
+const getClient = (region: string): SSM => {
   if (!clients[region]) {
     clients[region] = new SSM({ region });
   }
@@ -21,36 +18,102 @@ interface GetParameterRequest {
    */
   name: string;
   /**
-   * Time to live in seconds. Defaults to caching for as long as the node process lives
+   * Key to use for caching. Default: name
+   */
+  cacheKey?: string;
+  /**
+   * Time to live in seconds. Default: ttl set within the SSMCache instance
    */
   ttl?: number;
   /**
-   * Region from which to fetch the parameter. Defaults to defaultRegion
+   * Region from which to fetch the parameter. Default: region set within the SSMCache instance
    */
   region?: string;
 }
 
 /**
- * Retrieves and caches a parameter from SSM
- * @param params
- * See interface definition
+ * Parameters used to create a new SSMCache
  */
-export const getSSMParameter = async (params: GetParameterRequest): Promise<string> => {
-  const { name, ttl = 0, region } = params;
-  const cachedValue = cache.get<string>(name);
-  if (cachedValue) {
-    return cachedValue;
-  }
-  const client = getClient(region);
-  const output = await client.getParameter({
-    Name: name,
-    WithDecryption: true
-  }).promise();
+export interface SSMCacheParameters {
+  /**
+   * Region to be used
+   */
+  region: string;
 
-  const value = output.Parameter?.Value;
-  if (!value) {
-    throw new Error('No value found for parameter');
+  defaultTTL?: number;
+}
+
+/**
+ * SSMCache retrieves and caches parameters from SSM
+ */
+export class SSMCache {
+  private region: string;
+  private defaultTTL: number
+  /**
+   * Creates a new SSMCache instance
+   * @param params
+   * See interface definition
+   */
+  constructor (params: SSMCacheParameters) {
+    const { region, defaultTTL = 0 } = params;
+    this.region = region;
+    this.defaultTTL = defaultTTL;
   }
-  cache.set<string>(name, value, ttl);
-  return value;
-};
+
+  /**
+   * Retrieves and caches a parameter
+   * @param params
+   * See interface definition
+   */
+  public async getParameter (params: GetParameterRequest): Promise<string> {
+    const { name, region = this.region, ttl = this.defaultTTL } = params;
+    const cachedValue = cache.get<string>(name);
+    if (cachedValue) {
+      return cachedValue;
+    }
+    const client = getClient(region);
+    const output = await client.getParameter({
+      Name: name,
+      WithDecryption: true
+    }).promise();
+
+    const value = output.Parameter?.Value;
+    if (!value) {
+      throw new Error('No value found for parameter');
+    }
+    cache.set<string>(name, value, ttl);
+    return value;
+  }
+
+  /**
+   * Returns current region
+   */
+  public getRegion (): string {
+    return this.region;
+  }
+
+  /**
+   * Sets the region
+   * @param region
+   * Region as string. For example 'eu-west-1'
+   */
+  public setRegion (region: string): void {
+    this.region = region;
+  }
+
+  /**
+   * Returns the default TTL
+   */
+  public getDefaultTTL (): number {
+    return this.defaultTTL;
+  }
+
+  /**
+   * Sets the default TTL
+   * @param ttl
+   * TTL as a number in seconds
+   */
+  public setDefaultTTL (ttl: number): void {
+    this.defaultTTL = ttl;
+  }
+}
