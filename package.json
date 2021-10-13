@@ -4,10 +4,7 @@
   "description": "Wrapper around AWS SSM",
   "main": "index.js",
   "scripts": {
-    "build": "npx npm-run-all build:esbuild emit:types copy:files",
-    "build:esbuild": "npx esbuild src/*.ts --outdir=.dist --format=cjs --minify",
-    "emit:types": "tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir .dist --traceResolution",
-    "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
+    "build": "npx webpack",
     "publish:package": "npm publish .dist",
     "test": "npx jest --runInBand --config ./jest.config.js",
     "lint": "npx eslint 'src/**/*.ts'",
@@ -36,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "aws-sdk": "^2.997.0",
+    "copy-webpack-plugin": "^9.0.1",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.24.2",
@@ -45,7 +43,14 @@
     "jest": "^27.2.5",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^27.0.5",
-    "typescript": "^4.4.3"
+    "ts-loader": "^9.2.6",
+    "tsconfig-paths-webpack-plugin": "^3.5.1",
+    "ttypescript": "^1.5.12",
+    "typescript": "^4.4.3",
+    "typescript-transform-paths": "^3.3.1",
+    "webpack": "^5.58.1",
+    "webpack-cli": "^4.9.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "husky": {
     "hooks": {
