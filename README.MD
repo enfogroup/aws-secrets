@@ -8,6 +8,8 @@ This package exposes functionality for getting parameters from SSM and caching t
 npm install @enfo/aws-secrets --save
 ```
 
+The aws-sdk is a peer dependency and must be installed by you.
+
 ## Features
 
 ### SSMCache
