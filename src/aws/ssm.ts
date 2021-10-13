@@ -13,3 +13,18 @@ export const getClient = (region: string): SSM => {
   }
   return clients[region];
 };
+
+/**
+ * Retrieves a parameter from SSM
+ * @param region
+ * AWS region
+ * @param name
+ * Name of parameter
+ * @returns
+ * string or undefined
+ */
+export const getParameter = async (region: string, name: string): Promise<string | undefined> => {
+  const client = getClient(region);
+  const output = await client.getParameter({ Name: name, WithDecryption: true }).promise();
+  return output.Parameter?.Value;
+};

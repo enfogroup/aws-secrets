@@ -1,4 +1,4 @@
-import { getClient } from '@aws/ssm';
+import { getParameter } from '@aws/ssm';
 import { cache } from '@helpers/cache';
 
 /**
@@ -63,13 +63,8 @@ export class SSMCache {
     if (cachedValue) {
       return cachedValue;
     }
-    const client = getClient(region);
-    const output = await client.getParameter({
-      Name: name,
-      WithDecryption: true
-    }).promise();
 
-    const value = output.Parameter?.Value;
+    const value = await getParameter(region, name);
     if (!value) {
       throw new Error('No value found for parameter');
     }
