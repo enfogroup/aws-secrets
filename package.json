@@ -9,7 +9,7 @@
     "emit:types": "tsc --emitDeclarationOnly --outDir .dist",
     "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
     "publish:package": "npm publish .dist",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx jest --runInBand",
     "lint": "npx eslint 'src/**/*.ts'",
     "lint:fix": "npx eslint -fix 'src/**/*.ts'"
   },
@@ -42,13 +42,16 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^4.3.8",
+    "jest": "^27.2.5",
     "npm-run-all": "^4.1.5",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.4.3"
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run lint"
+      "pre-commit": "npm run lint",
+      "pre-push": "npm test"
     }
   },
   "peerDependencies": {
