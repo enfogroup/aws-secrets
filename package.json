@@ -9,7 +9,7 @@
     "emit:types": "tsc --emitDeclarationOnly --outDir .dist",
     "copy:files": "cp package.json .dist/ && cp README.MD .dist/ && cp LICENSE .dist/",
     "publish:package": "npm publish .dist",
-    "test": "npx jest --runInBand",
+    "test": "npx jest --runInBand --config ./jest.config.js",
     "lint": "npx eslint 'src/**/*.ts'",
     "lint:fix": "npx eslint -fix 'src/**/*.ts'"
   },

@@ -4,7 +4,10 @@ const { compilerOptions } = require('./tsconfig');
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: compilerOptions.baseUrl }),
+  modulePaths: [
+    '<rootDir>'
+  ],
   testPathIgnorePatterns: [
     '/node_modules/'
   ],
