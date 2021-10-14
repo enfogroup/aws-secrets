@@ -10,9 +10,8 @@ npm install @enfo/aws-secrets --save
 
 The aws-sdk is a peer dependency and must be installed by you.
 
-## Features
 
-### SSMCache
+## SSMCache
 
 SSMCache can retrieve and cache parameters from SSM. Parameters of type String and SecureString are supported. Configuration options on the getParameter method:
 
