@@ -1,5 +1,5 @@
 // istanbul ignore file
-import SSM from 'aws-sdk/clients/SSM';
+import SSM from 'aws-sdk/clients/ssm';
 
 const clients: Record<string, SSM> = {};
 /**
