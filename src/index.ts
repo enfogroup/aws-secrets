@@ -1,2 +1,2 @@
 // istanbul ignore file
-export { SSMCache } from '@clients/ssm';
+export { SSMCache, GetParameterRequest } from '@clients/ssm';

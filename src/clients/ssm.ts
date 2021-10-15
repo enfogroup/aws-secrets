@@ -4,7 +4,7 @@ import { cache } from '@helpers/cache';
 /**
  * Parameters when getting a parameter
  */
-interface GetParameterRequest {
+export interface GetParameterRequest {
   /**
    * Name of SSM parameter
    */
