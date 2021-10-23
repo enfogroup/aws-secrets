@@ -16,14 +16,14 @@ export const getClient = (region: string): SecretsManager => {
 
 /**
  * Retrieves a secret from SecretsManager
- * @param params
- * See interface definition
  * @param region
  * AWS region
+ * @param params
+ * See interface definition
  * @returns
  * string or undefined
  */
-export const getSecretValue = async (params: SecretsManager.GetSecretValueRequest, region: string): Promise<string | undefined> => {
+export const getSecretValue = async (region: string, params: SecretsManager.GetSecretValueRequest): Promise<string | undefined> => {
   const client = getClient(region);
   const output = await client.getSecretValue(params).promise();
   return output.SecretString;

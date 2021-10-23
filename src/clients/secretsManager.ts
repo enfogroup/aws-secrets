@@ -70,11 +70,11 @@ export class SecretsManagerCache {
       return cachedValue;
     }
 
-    const value = await getSecretValue({
+    const value = await getSecretValue(region, {
       SecretId: id,
       VersionId: versionId,
       VersionStage: versionStage
-    }, region);
+    });
     if (!value) {
       throw new Error('No value found for secret');
     }
