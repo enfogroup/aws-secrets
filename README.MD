@@ -78,12 +78,12 @@ const foo = async () => {
   const thirdValue = await secretsManagerCache.getSecretAsString({ id: 'third-secret', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey'})
 
   // no request is made to SecretsManager since this is cached
-  await secretsManagerCache.getSecretAsString({ name: 'my-secret'})
+  await secretsManagerCache.getSecretAsString({ id: 'my-secret'})
 
   interface MyData {
     a: number;
     b: string;
   }
-  const jsonValue = await secretsManager.getSecretAsJson<MyData>({ id: 'fourth-secret' })
+  const jsonValue = await secretsManagerCache.getSecretAsJson<MyData>({ id: 'fourth-secret' })
 }
 ```
