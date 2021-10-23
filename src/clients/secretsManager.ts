@@ -59,11 +59,11 @@ export class SecretsManagerCache {
   }
 
   /**
-   * Retrieves and caches a parameter
+   * Retrieves and caches a secret. The value will be returned as string
    * @param params
    * See interface definition
    */
-  public async getSecret (params: GetSecretRequest): Promise<string> {
+  public async getSecretAsString (params: GetSecretRequest): Promise<string> {
     const { id, versionId, versionStage, region = this.region, ttl = this.defaultTTL, cacheKey = id } = params;
     const cachedValue = cache.get<string>(cacheKey);
     if (cachedValue) {
@@ -80,6 +80,16 @@ export class SecretsManagerCache {
     }
     cache.set<string>(cacheKey, value, ttl);
     return value;
+  }
+
+  /**
+   * Retrieves and caches a secret. The value will be parsed as JSON
+   * @param params
+   * See interface definition
+   */
+  public async getSecretAsJson <T> (params: GetSecretRequest): Promise<T> {
+    const value = await this.getSecretAsString(params);
+    return JSON.parse(value) as T;
   }
 
   /**
