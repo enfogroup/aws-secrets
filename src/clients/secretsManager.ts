@@ -22,7 +22,7 @@ export interface GetSecretRequest {
    */
   ttl?: number;
   /**
-   * Region from which to fetch the parameter. Default: region set within the SecretsManagerCache instance
+   * Region from which to fetch the secret. Default: region set within the SecretsManagerCache instance
    */
   region?: string;
 }
