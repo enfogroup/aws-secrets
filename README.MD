@@ -10,6 +10,12 @@ npm install @enfo/aws-secrets --save
 
 The aws-sdk is a peer dependency and must be installed by you.
 
+## Available caches
+
+This package exposes wrappers for two AWS secrets services: SSMCache and SecretsManagerCache. Both are built for retrieving and caching a value. The caches have the same constructor parameters:
+
+* region - region from which the values should be retrieved
+* defaultTTL - optional default TTL to use on all requests. Defaults to 0 which means a value will be cached for as long as the node process lives
 
 ## SSMCache
 
