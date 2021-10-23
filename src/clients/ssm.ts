@@ -31,7 +31,9 @@ export interface SSMCacheParameters {
    * Region to be used
    */
   region: string;
-
+  /**
+   * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
+   */
   defaultTTL?: number;
 }
 
