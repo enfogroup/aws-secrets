@@ -1,4 +1,4 @@
-import { getSecret } from '@aws/secretsManager';
+import { getSecret } from '@aws/secretsmanager';
 import { cache } from '@helpers/cache';
 
 /**
