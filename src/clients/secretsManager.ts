@@ -87,7 +87,7 @@ export class SecretsManagerCache {
    * @param params
    * See interface definition
    */
-  public async getSecretAsJson <T> (params: GetSecretRequest): Promise<T> {
+  public async getSecretasJSON <T> (params: GetSecretRequest): Promise<T> {
     const value = await this.getSecretAsString(params);
     return JSON.parse(value) as T;
   }
