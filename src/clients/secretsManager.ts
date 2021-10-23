@@ -1,4 +1,4 @@
-import { getSecret } from '@aws/secretsmanager';
+import { getSecretValue } from '@aws/secretsmanager';
 import { cache } from '@helpers/cache';
 
 /**
@@ -70,7 +70,7 @@ export class SecretsManagerCache {
       return cachedValue;
     }
 
-    const value = await getSecret({
+    const value = await getSecretValue({
       SecretId: id,
       VersionId: versionId,
       VersionStage: versionStage

@@ -23,7 +23,7 @@ export const getClient = (region: string): SecretsManager => {
  * @returns
  * string or undefined
  */
-export const getSecret = async (params: SecretsManager.GetSecretValueRequest, region: string): Promise<string | undefined> => {
+export const getSecretValue = async (params: SecretsManager.GetSecretValueRequest, region: string): Promise<string | undefined> => {
   const client = getClient(region);
   const output = await client.getSecretValue(params).promise();
   return output.SecretString;
