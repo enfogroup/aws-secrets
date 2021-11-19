@@ -134,7 +134,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue(JSON.stringify(input));
       const instance = new SecretsManagerCache({ region: 'eu-west-1' });
 
-      const output = await instance.getSecretAsJson<Input>({ id: 'AsJSON' });
+      const output = await instance.getSecretAsJSON<Input>({ id: 'AsJSON' });
 
       expect(output).toEqual(input);
       checkAllMocksCalled([getSecretMock], 1);

@@ -99,7 +99,7 @@ export class SecretsManagerCache {
    * @param params
    * See interface definition
    */
-  public async getSecretAsJson<T> (params: GetSecretRequest): Promise<T> { // code duplicated from above, the deprecation tag was inherited
+  public async getSecretAsJSON<T> (params: GetSecretRequest): Promise<T> { // code duplicated from above, the deprecation tag was inherited
     const value = await this.getSecretAsString(params);
     return JSON.parse(value) as T;
   }
