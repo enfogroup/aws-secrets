@@ -101,7 +101,7 @@ describe('secretsmanager', () => {
     });
   });
 
-  describe('getSecretasJSON', () => {
+  describe('getSecretssJSON', () => {
     it('should parse the returned secret value as JSON', async () => {
       interface Input {
         a: number;
@@ -115,6 +115,26 @@ describe('secretsmanager', () => {
       const instance = new SecretsManagerCache({ region: 'eu-west-1' });
 
       const output = await instance.getSecretasJSON<Input>({ id: 'asJSON' });
+
+      expect(output).toEqual(input);
+      checkAllMocksCalled([getSecretMock], 1);
+    });
+  });
+
+  describe('getSecretAsJSON', () => {
+    it('should parse the returned secret value as JSON', async () => {
+      interface Input {
+        a: number;
+        b: string;
+      }
+      const input: Input = {
+        a: 42,
+        b: 'theAnswer'
+      };
+      const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue(JSON.stringify(input));
+      const instance = new SecretsManagerCache({ region: 'eu-west-1' });
+
+      const output = await instance.getSecretAsJSON<Input>({ id: 'AsJSON' });
 
       expect(output).toEqual(input);
       checkAllMocksCalled([getSecretMock], 1);

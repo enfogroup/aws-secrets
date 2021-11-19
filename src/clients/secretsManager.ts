@@ -86,8 +86,20 @@ export class SecretsManagerCache {
    * Retrieves and caches a secret. The value will be parsed as JSON
    * @param params
    * See interface definition
+   * @deprecated
+   * Use getSecretAsJSON instead. This method has a spelling mistake and will be removed in the next major release.
    */
   public async getSecretasJSON <T> (params: GetSecretRequest): Promise<T> {
+    const value = await this.getSecretAsString(params);
+    return JSON.parse(value) as T;
+  }
+
+  /**
+   * Retrieves and caches a secret. The value will be parsed as JSON
+   * @param params
+   * See interface definition
+   */
+  public async getSecretAsJSON<T> (params: GetSecretRequest): Promise<T> { // code duplicated from above, the deprecation tag was inherited
     const value = await this.getSecretAsString(params);
     return JSON.parse(value) as T;
   }

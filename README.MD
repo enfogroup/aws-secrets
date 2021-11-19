@@ -54,9 +54,9 @@ const foo = async () => {
 SecretsManagerCache can retrieve and cache parameters from SecretsManager. Two methods for getting secrets are available:
 
 * getSecretAsString - returns the secret value as string
-* getSecretasJSON - returns the secret value as JSON. You can specify the interface as which the secret should be returned
+* getSecretAsJSON - returns the secret value as JSON. You can specify the interface as which the secret should be returned
 
-These are the configuration options on the getSecretAsString and getSecretasJSON methods:
+These are the configuration options on the getSecretAsString and getSecretAsJSON methods:
 
 * id - id of secret
 * versionId - version id of the secret
@@ -90,6 +90,6 @@ const foo = async () => {
     a: number;
     b: string;
   }
-  const jsonValue = await secretsManagerCache.getSecretasJSON<MyData>({ id: 'fourth-secret' })
+  const jsonValue = await secretsManagerCache.getSecretAsJSON<MyData>({ id: 'fourth-secret' })
 }
 ```
