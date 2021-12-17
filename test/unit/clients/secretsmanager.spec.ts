@@ -18,7 +18,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('my-value-1');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getSecretAsString({ id: 'working' });
+      const output = await instance.getSecretAsString({ SecretId: 'working' });
 
       expect(output).toEqual('my-value-1');
       expect(getSecretMock.mock.calls[0][0]).toEqual('eu-west-1');
@@ -29,7 +29,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('ignoreMe!');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getSecretAsString({ id: 'working' });
+      const output = await instance.getSecretAsString({ SecretId: 'working' });
 
       expect(output).toEqual('my-value-1');
       checkAllMocksCalled([getSecretMock], 0);
@@ -39,7 +39,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('my-value-2');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getSecretAsString({ id: 'region', region: 'us-east-2' });
+      const output = await instance.getSecretAsString({ SecretId: 'region', region: 'us-east-2' });
 
       expect(output).toEqual('my-value-2');
       expect(getSecretMock.mock.calls[0][0]).toEqual('us-east-2');
@@ -53,11 +53,11 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('value-defaultTTL');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await instance.getSecretAsString({ id: 'defaultTTL' });
+      await instance.getSecretAsString({ SecretId: 'defaultTTL' });
       jest // forwards time by 20 minutes. 1200 > 1000
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.getSecretAsString({ id: 'defaultTTL' });
+      const output = await instance.getSecretAsString({ SecretId: 'defaultTTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([getSecretMock], 2);
@@ -70,11 +70,11 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('value-defaultTTL');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await instance.getSecretAsString({ id: 'TTL', ttl: 1300 });
+      await instance.getSecretAsString({ SecretId: 'TTL', ttl: 1300 });
       jest // forwards time by 20 minutes. 1200 < 1300
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.getSecretAsString({ id: 'TTL' });
+      const output = await instance.getSecretAsString({ SecretId: 'TTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([getSecretMock], 1);
@@ -84,8 +84,8 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('my-value-4');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getSecretAsString({ id: 'sharedCached1', cacheKey: 'cacheMe!' });
-      const output2 = await instance.getSecretAsString({ id: 'sharedCached2', cacheKey: 'cacheMe!' });
+      const output = await instance.getSecretAsString({ SecretId: 'sharedCached1', cacheKey: 'cacheMe!' });
+      const output2 = await instance.getSecretAsString({ SecretId: 'sharedCached2', cacheKey: 'cacheMe!' });
 
       expect(output).toEqual('my-value-4');
       expect(output2).toEqual('my-value-4');
@@ -96,7 +96,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue(undefined);
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await expect(instance.getSecretAsString({ id: 'throw' })).rejects.toThrow('No value found for secret');
+      await expect(instance.getSecretAsString({ SecretId: 'throw' })).rejects.toThrow('No value found for secret');
       checkAllMocksCalled([getSecretMock], 1);
     });
   });
@@ -114,7 +114,7 @@ describe('secretsmanager', () => {
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue(JSON.stringify(input));
       const instance = new SecretsManagerCache({ region: 'eu-west-1' });
 
-      const output = await instance.getSecretAsJSON<Input>({ id: 'AsJSON' });
+      const output = await instance.getSecretAsJSON<Input>({ SecretId: 'AsJSON' });
 
       expect(output).toEqual(input);
       checkAllMocksCalled([getSecretMock], 1);

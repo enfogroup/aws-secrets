@@ -18,7 +18,7 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('my-value-1');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getParameter({ name: 'working' });
+      const output = await instance.getParameter({ Name: 'working' });
 
       expect(output).toEqual('my-value-1');
       expect(getParameterMock.mock.calls[0][0]).toEqual('eu-west-1');
@@ -29,7 +29,7 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('ignoreMe!');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getParameter({ name: 'working' });
+      const output = await instance.getParameter({ Name: 'working' });
 
       expect(output).toEqual('my-value-1');
       checkAllMocksCalled([getParameterMock], 0);
@@ -39,7 +39,7 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('my-value-2');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getParameter({ name: 'region', region: 'us-east-2' });
+      const output = await instance.getParameter({ Name: 'region', region: 'us-east-2' });
 
       expect(output).toEqual('my-value-2');
       expect(getParameterMock.mock.calls[0][0]).toEqual('us-east-2');
@@ -53,11 +53,11 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('value-defaultTTL');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await instance.getParameter({ name: 'defaultTTL' });
+      await instance.getParameter({ Name: 'defaultTTL' });
       jest // forwards time by 20 minutes. 1200 > 1000
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.getParameter({ name: 'defaultTTL' });
+      const output = await instance.getParameter({ Name: 'defaultTTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([getParameterMock], 2);
@@ -70,11 +70,11 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('value-defaultTTL');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await instance.getParameter({ name: 'TTL', ttl: 1300 });
+      await instance.getParameter({ Name: 'TTL', ttl: 1300 });
       jest // forwards time by 20 minutes. 1200 < 1300
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.getParameter({ name: 'TTL' });
+      const output = await instance.getParameter({ Name: 'TTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([getParameterMock], 1);
@@ -84,8 +84,8 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('my-value-4');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.getParameter({ name: 'sharedCached1', cacheKey: 'cacheMe!' });
-      const output2 = await instance.getParameter({ name: 'sharedCached2', cacheKey: 'cacheMe!' });
+      const output = await instance.getParameter({ Name: 'sharedCached1', cacheKey: 'cacheMe!' });
+      const output2 = await instance.getParameter({ Name: 'sharedCached2', cacheKey: 'cacheMe!' });
 
       expect(output).toEqual('my-value-4');
       expect(output2).toEqual('my-value-4');
@@ -96,7 +96,7 @@ describe('ssm', () => {
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue(undefined);
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await expect(instance.getParameter({ name: 'throw' })).rejects.toThrow('No value found for parameter');
+      await expect(instance.getParameter({ Name: 'throw' })).rejects.toThrow('No value found for parameter');
       checkAllMocksCalled([getParameterMock], 1);
     });
   });
