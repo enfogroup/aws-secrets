@@ -1,8 +1,8 @@
 // to be tested
-import { SecretsManagerCache } from '@clients/secretsmanager';
+import { SecretsManagerCache } from '@clients/secretsManager';
 
 // to be mocked
-import * as smHelper from '@aws/secretsmanager';
+import * as smHelper from '@aws/secretsManager';
 
 // tools
 import { checkAllMocksCalled } from '@test/tools';
@@ -97,26 +97,6 @@ describe('secretsmanager', () => {
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await expect(instance.getSecretAsString({ id: 'throw' })).rejects.toThrow('No value found for secret');
-      checkAllMocksCalled([getSecretMock], 1);
-    });
-  });
-
-  describe('getSecretssJSON', () => {
-    it('should parse the returned secret value as JSON', async () => {
-      interface Input {
-        a: number;
-        b: string;
-      }
-      const input: Input = {
-        a: 42,
-        b: 'theAnswer'
-      };
-      const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue(JSON.stringify(input));
-      const instance = new SecretsManagerCache({ region: 'eu-west-1' });
-
-      const output = await instance.getSecretasJSON<Input>({ id: 'asJSON' });
-
-      expect(output).toEqual(input);
       checkAllMocksCalled([getSecretMock], 1);
     });
   });
