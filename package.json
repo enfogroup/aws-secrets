@@ -1,7 +1,7 @@
 {
   "name": "@enfo/aws-secrets",
   "version": "1.3.1",
-  "description": "Wrapper around AWS SSM",
+  "description": "NPM package for getting data from SSM, SecretsManager and KMS. All returned values are cached for further use.",
   "private": false,
   "main": "index.js",
   "scripts": {
