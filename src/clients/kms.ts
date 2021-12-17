@@ -40,7 +40,7 @@ export class KMSCache extends Cache {
   }
 
   /**
-   * Decrypts a cipher text blob
+   * Decrypts and caches a ciphertext blob
    * @param params
    * See interface definition
    */
@@ -60,5 +60,15 @@ export class KMSCache extends Cache {
         return value.toString();
       }
     });
+  }
+
+  /**
+   * Decrypts and caches a ciphertext blob. The value will be parsed as JSON
+   * @param params
+   * See interface definition
+   */
+  public async decryptAsJSON<T> (params: DecryptRequest): Promise<T> {
+    const value = await this.decrypt(params);
+    return JSON.parse(value) as T;
   }
 }
