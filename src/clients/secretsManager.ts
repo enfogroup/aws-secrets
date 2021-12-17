@@ -51,7 +51,7 @@ export class SecretsManagerCache extends Cache {
    * See interface definition
    */
   public async getSecretAsString (params: GetSecretRequest): Promise<string> {
-    const { id, versionId, versionStage, region = this.region, ttl = this.defaultTTL, cacheKey = id } = params;
+    const { id, versionId, versionStage, region = this.region, ttl, cacheKey = id } = params;
     return await this.getAndCache<string>({
       cacheKey,
       noValueFoundMessage: 'No value found for secret',

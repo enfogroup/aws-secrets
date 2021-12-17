@@ -47,7 +47,7 @@ export class SSMCache extends Cache {
    * See interface definition
    */
   public async getParameter (params: GetParameterRequest): Promise<string> {
-    const { name, region = this.region, ttl = this.defaultTTL, cacheKey = name } = params;
+    const { name, region = this.region, ttl, cacheKey = name } = params;
     return this.getAndCache({
       cacheKey,
       ttl,
