@@ -1,5 +1,5 @@
 import { getSecretValue } from '@aws/secretsManager';
-import { Cache } from './cache';
+import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a secret
@@ -30,21 +30,22 @@ export interface GetSecretRequest {
 /**
  * Parameters used to create a new SecretsManagerCache
  */
-export interface SecretsManagerCacheParameters {
-  /**
-   * Region to be used
-   */
-  region: string;
-  /**
-   * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
-   */
-  defaultTTL?: number;
-}
+export type SecretsManagerCacheParameters = CacheParameters
 
 /**
  * SecretsManagerCache retrieves and caches secrets from SecretsManager
  */
 export class SecretsManagerCache extends Cache {
+  /**
+   * Creates a new SecretsManagerCache instance
+   * @param params
+   * See interface definition
+   */
+  // eslint-disable-next-line no-useless-constructor
+  constructor (params: SecretsManagerCacheParameters) {
+    super(params);
+  }
+
   /**
    * Retrieves and caches a secret. The value will be returned as string
    * @param params

@@ -1,5 +1,5 @@
 import { getParameter } from '@aws/ssm';
-import { Cache } from './cache';
+import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a parameter
@@ -26,21 +26,22 @@ export interface GetParameterRequest {
 /**
  * Parameters used to create a new SSMCache
  */
-export interface SSMCacheParameters {
-  /**
-   * Region to be used
-   */
-  region: string;
-  /**
-   * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
-   */
-  defaultTTL?: number;
-}
+export type SSMCacheParameters = CacheParameters
 
 /**
  * SSMCache retrieves and caches parameters from SSM
  */
 export class SSMCache extends Cache {
+  /**
+   * Creates a new SSMCache instance
+   * @param params
+   * See interface definition
+   */
+  // eslint-disable-next-line no-useless-constructor
+  constructor (params: SSMCacheParameters) {
+    super(params);
+  }
+
   /**
    * Retrieves and caches a parameter
    * @param params
