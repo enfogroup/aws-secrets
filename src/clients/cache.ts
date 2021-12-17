@@ -33,7 +33,7 @@ export interface GetAndCacheParameters<T> {
   /**
    * Function to execute and await if no value is found in cache
    */
-  fun: () => Promise<T>
+  fun: () => Promise<T | undefined>
 }
 
 /**
