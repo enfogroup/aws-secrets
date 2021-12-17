@@ -44,7 +44,7 @@ export class KMSCache extends Cache {
    * @param params
    * See interface definition
    */
-  public async decrypts (params: DecryptRequest): Promise<string> {
+  public async decrypt (params: DecryptRequest): Promise<string> {
     const { region = this.region, ttl, cacheKey, ...rest } = params;
     return this.getAndCache({
       cacheKey,

@@ -1,8 +1,6 @@
 // to be tested
 import { Cache } from '@clients/cache';
 
-// tools
-
 describe('cache', () => {
   describe('getRegion', () => {
     it('should return the current region', () => {
