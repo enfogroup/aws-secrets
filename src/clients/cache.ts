@@ -1,7 +1,7 @@
 import { cache } from '@helpers/cache';
 
 /**
- * Parameters used to create a new Cache
+ * Parameters used to create a new instance
  */
 export interface CacheParameters {
   /**
