@@ -43,7 +43,7 @@ export class Cache {
   protected region: string;
   protected defaultTTL: number
   /**
-   * Creates a new Cache instance
+   * Creates a new instance
    * @param params
    * See interface definition
    */
