@@ -1,16 +1,14 @@
+import { GetParameterRequest as SSMGetParameterRequest } from 'aws-sdk/clients/ssm';
+
 import { getParameter } from '@aws/ssm';
 import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a parameter
  */
-export interface GetParameterRequest {
+export interface GetParameterRequest extends Omit<SSMGetParameterRequest, 'WithDecryption'> {
   /**
-   * Name of SSM parameter
-   */
-  name: string;
-  /**
-   * Key to use for caching. Default: name
+   * Key to use for caching. Default: Name
    */
   cacheKey?: string;
   /**
@@ -48,12 +46,12 @@ export class SSMCache extends Cache {
    * See interface definition
    */
   public async getParameter (params: GetParameterRequest): Promise<string> {
-    const { name, region = this.region, ttl, cacheKey = name } = params;
+    const { Name, region = this.region, ttl, cacheKey = Name } = params;
     return this.getAndCache({
       cacheKey,
       ttl,
       noValueFoundMessage: 'No value found for parameter',
-      fun: () => getParameter(region, name)
+      fun: () => getParameter(region, Name)
     });
   }
 }

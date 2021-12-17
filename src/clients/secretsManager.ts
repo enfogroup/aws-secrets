@@ -1,20 +1,14 @@
+import { GetSecretValueRequest as SMGetSecretValueRequest } from 'aws-sdk/clients/secretsmanager';
+
 import { getSecretValue } from '@aws/secretsManager';
 import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a secret
  */
-export interface GetSecretRequest {
+export interface GetSecretRequest extends SMGetSecretValueRequest {
   /**
-   * ID of SecretsManager secret
-   */
-  id: string;
-
-  versionId?: string;
-
-  versionStage?: string;
-  /**
-   * Key to use for caching. Default: name
+   * Key to use for caching. Default: Id
    */
   cacheKey?: string;
   /**
@@ -52,15 +46,14 @@ export class SecretsManagerCache extends Cache {
    * See interface definition
    */
   public async getSecretAsString (params: GetSecretRequest): Promise<string> {
-    const { id, versionId, versionStage, region = this.region, ttl, cacheKey = id } = params;
+    const { SecretId, region = this.region, ttl, cacheKey = SecretId, ...rest } = params;
     return await this.getAndCache<string>({
       cacheKey,
       noValueFoundMessage: 'No value found for secret',
       ttl,
       fun: () => getSecretValue(region, {
-        SecretId: id,
-        VersionId: versionId,
-        VersionStage: versionStage
+        SecretId,
+        ...rest
       })
     });
   }
