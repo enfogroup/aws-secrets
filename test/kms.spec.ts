@@ -100,4 +100,22 @@ describe('kms', () => {
       checkAllMocksCalled([decryptMock], 1);
     });
   });
+
+  describe('decryptAsJSON', () => {
+    it('should parse value as JSON', async () => {
+      interface Stuff {
+        a: number
+      }
+      const data: Stuff = {
+        a: 47
+      };
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(JSON.stringify(data));
+      const instance = new KMSCache({ region: 'eu-west-1' });
+
+      const output = await instance.decryptAsJSON<Stuff>({ cacheKey: 'asJSON', CiphertextBlob: 'Something' });
+
+      expect(output).toEqual(data);
+      checkAllMocksCalled([decryptMock], 1);
+    });
+  });
 });
