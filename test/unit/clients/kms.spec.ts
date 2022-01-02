@@ -118,4 +118,8 @@ describe('kms', () => {
       checkAllMocksCalled([decryptMock], 1);
     });
   });
+
+  describe('enableCiphertextAsKey', () => {
+
+  });
 });
