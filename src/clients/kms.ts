@@ -21,12 +21,12 @@ export interface DecryptRequest extends KMSDecryptRequest {
 }
 
 /**
- * Parameters used to create a new SSMCache
+ * Parameters used to create a new KMSCache
  */
 export type KMSCacheParameters = CacheParameters
 
 /**
- * SSMCache retrieves and caches parameters from SSM
+ * KMSCache decrypts and cached data encrypted using KMS
  */
 export class KMSCache extends Cache {
   /**
