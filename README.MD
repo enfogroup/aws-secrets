@@ -41,7 +41,7 @@ const foo = async () => {
    // cached for 10 seconds
   const anotherParameter = await ssmCache.getParameter({ Name: 'my-other-parameter' })
 
-  // retrieved from 'us-east-2', cached for 20 seconds using the key 'coolKey'
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'coolKey'
   const thirdParameter = await ssmCache.getParameter({ Name: 'third-parameter', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey'})
 
   // no request is made to SSM since this is cached
@@ -78,7 +78,7 @@ const foo = async () => {
    // cached for 10 seconds
   const anotherValue = await secretsManagerCache.getSecretAsString({ SecretId: 'my-other-secret' })
 
-  // retrieved from 'us-east-2', cached for 20 seconds using the key 'coolKey'
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'coolKey'
   const thirdValue = await secretsManagerCache.getSecretAsString({ SecretId: 'third-secret', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey' })
 
   // no request is made to SecretsManager since this is cached
@@ -117,22 +117,22 @@ const kmsCache = new KMSCache({ region: 'eu-west-1' })
 
 const foo = async () => {
    // retrieved and cached forever
-  const myValue = await kmsCache.decrypt({ CiphertextBlob: 'abc...' })
+  const myValue = await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIa...==', 'base64') })
 
   kmsCache.setDefaultTTL(10)
    // cached for 10 seconds
-  const anotherValue = await kmsCache.decrypt({ CiphertextBlob: 'def...' })
+  const anotherValue = await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIb...==', 'base64') })
 
-  // retrieved from 'us-east-2', cached for 20 seconds using the key 'thirdValue'
-  const thirdValue = await kmsCache.decrypt({ CiphertextBlob: 'ghi..', ttl: 1200, region: 'us-east-2', cacheKey: 'thirdValue' })
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'thirdValue'
+  const thirdValue = await kmsCache.decrypt({ Buffer.from('AQIc...==', 'base64'), ttl: 1200, region: 'us-east-2', cacheKey: 'thirdValue' })
 
-  // no request is made to KMS since this is cached
-  await kmsCache.decrypt({ CiphertextBlob: 'abc...' })
+  // no request is made to KMS since this is cached from the first request
+  await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIa...==', 'base64') })
 
   interface MyData {
     a: number;
     b: string;
   }
-  const jsonValue = await kmsCache.decryptAsJSON<MyData>({ CiphertextBlob: 'jkl...' })
+  const jsonValue = await kmsCache.decryptAsJSON<MyData>({ CiphertextBlob: Buffer.from('AQId...==', 'base64') })
 }
 ```
