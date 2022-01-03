@@ -7,7 +7,7 @@ import { Cache, CacheParameters } from './cache';
  */
 export interface DecryptRequest extends KMSDecryptRequest {
   /**
-   * Key to use for caching
+   * Key to use for caching. Default: string value of CiphertextBlob
    */
   cacheKey?: string;
   /**
@@ -29,7 +29,6 @@ export type KMSCacheParameters = CacheParameters
  * SSMCache retrieves and caches parameters from SSM
  */
 export class KMSCache extends Cache {
-  #useCiphertextAsKey = false
   /**
    * Creates a new KMSCache instance
    * @param params
@@ -46,7 +45,7 @@ export class KMSCache extends Cache {
    * See interface definition
    */
   public async decrypt (params: DecryptRequest): Promise<string> {
-    const { region = this.region, ttl, cacheKey = this.getCacheKey(params), ...rest } = params;
+    const { CiphertextBlob, region = this.region, ttl, cacheKey = CiphertextBlob.toString(), ...rest } = params;
     if (!cacheKey) {
       throw new Error('No cacheKey specified nor is usage of CiphertextBlob as the key enabled. You can enable it using enableCiphertextAsKey');
     }
@@ -56,6 +55,7 @@ export class KMSCache extends Cache {
       noValueFoundMessage: 'No value found in CiphertextBlob',
       fun: async () => {
         const value = await decrypt(region, {
+          CiphertextBlob,
           ...rest
         });
         if (!value) {
@@ -74,26 +74,5 @@ export class KMSCache extends Cache {
   public async decryptAsJSON<T> (params: DecryptRequest): Promise<T> {
     const value = await this.decrypt(params);
     return JSON.parse(value) as T;
-  }
-
-  private getCacheKey (params: DecryptRequest): string | undefined {
-    if (this.#useCiphertextAsKey) {
-      return params.CiphertextBlob.toString();
-    }
-    return undefined;
-  }
-
-  /**
-   * Enables the usage of CiphertextBlob as the cacheKey
-   */
-  public enableCiphertextAsKey () {
-    this.#useCiphertextAsKey = true;
-  }
-
-  /**
-   * Disables the usage of CiphertextBlob as the cacheKey
-   */
-  public disableCiphertextAsKey () {
-    this.#useCiphertextAsKey = false;
   }
 }
