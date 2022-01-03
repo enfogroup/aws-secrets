@@ -18,7 +18,7 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('my-value-1');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.decrypt({ CiphertextBlob: 'something', cacheKey: 'working' });
+      const output = await instance.decrypt({ CiphertextBlob: 'my-value-1' });
 
       expect(output).toEqual('my-value-1');
       expect(decryptMock.mock.calls[0][0]).toEqual('eu-west-1');
@@ -29,7 +29,7 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('ignoreMe!');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.decrypt({ CiphertextBlob: 'something', cacheKey: 'working' });
+      const output = await instance.decrypt({ CiphertextBlob: 'my-value-1' });
 
       expect(output).toEqual('my-value-1');
       checkAllMocksCalled([decryptMock], 0);
@@ -39,7 +39,7 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('my-value-2');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.decrypt({ cacheKey: 'region', region: 'us-east-2', CiphertextBlob: 'something' });
+      const output = await instance.decrypt({ region: 'us-east-2', CiphertextBlob: 'my-value-2' });
 
       expect(output).toEqual('my-value-2');
       expect(decryptMock.mock.calls[0][0]).toEqual('us-east-2');
@@ -57,7 +57,7 @@ describe('kms', () => {
       jest // forwards time by 20 minutes. 1200 > 1000
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.decrypt({ cacheKey: 'defaultTTL', CiphertextBlob: 'something' });
+      const output = await instance.decrypt({ CiphertextBlob: 'defaultTTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([decryptMock], 2);
@@ -70,11 +70,11 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('value-defaultTTL');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await instance.decrypt({ cacheKey: 'TTL', ttl: 1300, CiphertextBlob: 'TTL' });
+      await instance.decrypt({ ttl: 1300, CiphertextBlob: 'TTL' });
       jest // forwards time by 20 minutes. 1200 < 1300
         .useFakeTimers('modern')
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
-      const output = await instance.decrypt({ cacheKey: 'TTL', CiphertextBlob: 'TTL' });
+      const output = await instance.decrypt({ CiphertextBlob: 'TTL' });
 
       expect(output).toEqual('value-defaultTTL');
       checkAllMocksCalled([decryptMock], 1);
@@ -96,7 +96,7 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(undefined);
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      await expect(instance.decrypt({ CiphertextBlob: 'throw', cacheKey: 'throw' })).rejects.toThrow('No value found in CiphertextBlob');
+      await expect(instance.decrypt({ CiphertextBlob: 'throw' })).rejects.toThrow('No value found in CiphertextBlob');
       checkAllMocksCalled([decryptMock], 1);
     });
   });
@@ -112,7 +112,7 @@ describe('kms', () => {
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(JSON.stringify(data));
       const instance = new KMSCache({ region: 'eu-west-1' });
 
-      const output = await instance.decryptAsJSON<Stuff>({ cacheKey: 'asJSON', CiphertextBlob: 'Something' });
+      const output = await instance.decryptAsJSON<Stuff>({ CiphertextBlob: 'json' });
 
       expect(output).toEqual(data);
       checkAllMocksCalled([decryptMock], 1);
