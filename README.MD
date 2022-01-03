@@ -1,6 +1,6 @@
 ## Introduction
 
-This package exposes functionality for getting data from SSM, SecretsManager and KMS. All returned values are cached for further use.
+This package exposes functionality for getting data from SSM, SecretsManager and KMS. All values can be cached for further use.
 
 ## Installation
 
@@ -24,7 +24,7 @@ SSMCache can retrieve and cache parameters from SSM. Parameters of type String a
 * All parameters from SSM.GetParameterRequest except WithDecryption which is set to true
 * region (optional) - region to fetch parameter from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the parameter. Defaults to 0 (forever) or defaultTTL if specified in the constructor
-* cacheKey (optional) - key used for caching. Default: value of name
+* cacheKey (optional) - key used for caching. Default: Name
 
 ### Examples
 
@@ -61,7 +61,7 @@ These are the configuration options on the getSecretAsString and getSecretAsJSON
 * All keys from SecretsManager.GetSecretValueRequest
 * region (optional) - region to fetch secret from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the secret. Defaults to 0 (forever) or defaultTTL if specified in the constructor
-* cacheKey (optional) - key used for caching. Default: value of name
+* cacheKey (optional) - key used for caching. Default: SecretId
 
 ### Examples
 
@@ -102,9 +102,9 @@ KMSCache can decrypt and cache cipher texts. Two method are available:
 These are the configuration options on the decrypt and decryptAsJSON methods:
 
 * All keys from KMS.DecryptRequest
-* cacheKey - key used for caching
 * region (optional) - region to fetch secret from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the secret. Defaults to 0 (forever) or defaultTTL if specified in the constructor
+* cacheKey (optional) - key used for caching. Default: CiphertextBlob
 
 ### Examples
 
@@ -117,22 +117,22 @@ const kmsCache = new KMSCache({ region: 'eu-west-1' })
 
 const foo = async () => {
    // retrieved and cached forever
-  const myValue = await kmsCache.decrypt({ CiphertextBlob: 'abc...', cacheKey: 'firstValue' })
+  const myValue = await kmsCache.decrypt({ CiphertextBlob: 'abc...' })
 
   kmsCache.setDefaultTTL(10)
    // cached for 10 seconds
-  const anotherValue = await kmsCache.decrypt({ CiphertextBlob: 'def...', cacheKey: 'secondValue' })
+  const anotherValue = await kmsCache.decrypt({ CiphertextBlob: 'def...' })
 
   // retrieved from 'us-east-2', cached for 20 seconds using the key 'thirdValue'
   const thirdValue = await kmsCache.decrypt({ CiphertextBlob: 'ghi..', ttl: 1200, region: 'us-east-2', cacheKey: 'thirdValue' })
 
   // no request is made to KMS since this is cached
-  await kmsCache.decrypt({ CiphertextBlob: 'abc...', cacheKey: 'firstValue' })
+  await kmsCache.decrypt({ CiphertextBlob: 'abc...' })
 
   interface MyData {
     a: number;
     b: string;
   }
-  const jsonValue = await kmsCache.decryptAsJSON<MyData>({ CiphertextBlob: 'jkl...', cacheKey: 'fourthValue' })
+  const jsonValue = await kmsCache.decryptAsJSON<MyData>({ CiphertextBlob: 'jkl...' })
 }
 ```
