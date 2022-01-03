@@ -46,9 +46,6 @@ export class KMSCache extends Cache {
    */
   public async decrypt (params: DecryptRequest): Promise<string> {
     const { CiphertextBlob, region = this.region, ttl, cacheKey = CiphertextBlob.toString(), ...rest } = params;
-    if (!cacheKey) {
-      throw new Error('No cacheKey specified nor is usage of CiphertextBlob as the key enabled. You can enable it using enableCiphertextAsKey');
-    }
     return this.getAndCache({
       cacheKey,
       ttl,
