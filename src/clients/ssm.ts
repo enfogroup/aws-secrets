@@ -1,16 +1,14 @@
+import { GetParameterRequest as SSMGetParameterRequest } from 'aws-sdk/clients/ssm';
+
 import { getParameter } from '@aws/ssm';
-import { cache } from '@helpers/cache';
+import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a parameter
  */
-export interface GetParameterRequest {
+export interface GetParameterRequest extends Omit<SSMGetParameterRequest, 'WithDecryption'> {
   /**
-   * Name of SSM parameter
-   */
-  name: string;
-  /**
-   * Key to use for caching. Default: name
+   * Key to use for caching. Default: Name
    */
   cacheKey?: string;
   /**
@@ -26,32 +24,20 @@ export interface GetParameterRequest {
 /**
  * Parameters used to create a new SSMCache
  */
-export interface SSMCacheParameters {
-  /**
-   * Region to be used
-   */
-  region: string;
-  /**
-   * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
-   */
-  defaultTTL?: number;
-}
+export type SSMCacheParameters = CacheParameters
 
 /**
  * SSMCache retrieves and caches parameters from SSM
  */
-export class SSMCache {
-  private region: string;
-  private defaultTTL: number
+export class SSMCache extends Cache {
   /**
    * Creates a new SSMCache instance
    * @param params
    * See interface definition
    */
+  // eslint-disable-next-line no-useless-constructor
   constructor (params: SSMCacheParameters) {
-    const { region, defaultTTL = 0 } = params;
-    this.region = region;
-    this.defaultTTL = defaultTTL;
+    super(params);
   }
 
   /**
@@ -60,49 +46,12 @@ export class SSMCache {
    * See interface definition
    */
   public async getParameter (params: GetParameterRequest): Promise<string> {
-    const { name, region = this.region, ttl = this.defaultTTL, cacheKey = name } = params;
-    const cachedValue = cache.get<string>(cacheKey);
-    if (cachedValue) {
-      return cachedValue;
-    }
-
-    const value = await getParameter(region, name);
-    if (!value) {
-      throw new Error('No value found for parameter');
-    }
-    cache.set<string>(cacheKey, value, ttl);
-    return value;
-  }
-
-  /**
-   * Returns current region
-   */
-  public getRegion (): string {
-    return this.region;
-  }
-
-  /**
-   * Sets the region
-   * @param region
-   * Region as string. For example 'eu-west-1'
-   */
-  public setRegion (region: string): void {
-    this.region = region;
-  }
-
-  /**
-   * Returns the default TTL
-   */
-  public getDefaultTTL (): number {
-    return this.defaultTTL;
-  }
-
-  /**
-   * Sets the default TTL
-   * @param ttl
-   * TTL as a number in seconds
-   */
-  public setDefaultTTL (ttl: number): void {
-    this.defaultTTL = ttl;
+    const { Name, region = this.region, ttl, cacheKey = Name } = params;
+    return this.getAndCache({
+      cacheKey,
+      ttl,
+      noValueFoundMessage: 'No value found for parameter',
+      fun: () => getParameter(region, Name)
+    });
   }
 }

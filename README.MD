@@ -1,6 +1,6 @@
 ## Introduction
 
-This package exposes functionality for getting parameters from SSM and SecretsManager and caching them.
+This package exposes functionality for getting data from SSM, SecretsManager and KMS. All values can be cached for further use.
 
 ## Installation
 
@@ -8,11 +8,11 @@ This package exposes functionality for getting parameters from SSM and SecretsMa
 npm install @enfo/aws-secrets --save
 ```
 
-The aws-sdk is a peer dependency and must be installed by you.
+The aws-sdk@2.X is a peer dependency and must be installed by you.
 
 ## Available caches
 
-This package exposes wrappers for two AWS secrets services: SSMCache and SecretsManagerCache. Both are built for retrieving and caching a value. The caches have the same constructor parameters:
+This package exposes wrappers for three AWS secrets services: SSMCache, SecretsManagerCache and KMSCache. All three are built for retrieving and caching a value. All retrieval methods use extensions of the underlying AWS SDK method. This is the cause for the weird mismatch of camelCase and PascalCase in the request bodies. The caches have the same constructor parameters:
 
 * region - region from which the values should be retrieved
 * defaultTTL - optional default TTL to use on all requests. Defaults to 0 which means a value will be cached for as long as the node process lives
@@ -21,10 +21,10 @@ This package exposes wrappers for two AWS secrets services: SSMCache and Secrets
 
 SSMCache can retrieve and cache parameters from SSM. Parameters of type String and SecureString are supported. These are the configuration options on the getParameter method:
 
-* name - name of parameter to retrieve
+* All parameters from SSM.GetParameterRequest except WithDecryption which is set to true
 * region (optional) - region to fetch parameter from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the parameter. Defaults to 0 (forever) or defaultTTL if specified in the constructor
-* cacheKey (optional) - key used for caching. Default: value of name
+* cacheKey (optional) - key used for caching. Default: Name
 
 ### Examples
 
@@ -35,17 +35,17 @@ const ssmCache = new SSMCache({ region: 'eu-west-1' })
 
 const foo = async () => {
    // retrieved and cached forever
-  const myParameter = await ssmCache.getParameter({ name: 'my-parameter' })
+  const myParameter = await ssmCache.getParameter({ Name: 'my-parameter' })
 
   ssmCache.setDefaultTTL(10)
    // cached for 10 seconds
-  const anotherParameter = await ssmCache.getParameter({ name: 'my-other-parameter' })
+  const anotherParameter = await ssmCache.getParameter({ Name: 'my-other-parameter' })
 
-  // retrieved from 'us-east-2', cached for 20 seconds using the key 'coolKey'
-  const thirdParameter = await ssmCache.getParameter({ name: 'third-parameter', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey'})
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'coolKey'
+  const thirdParameter = await ssmCache.getParameter({ Name: 'third-parameter', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey'})
 
   // no request is made to SSM since this is cached
-  await ssmCache.getParameter({ name: 'my-parameter'})
+  await ssmCache.getParameter({ Name: 'my-parameter'})
 }
 ```
 
@@ -58,12 +58,10 @@ SecretsManagerCache can retrieve and cache parameters from SecretsManager. Two m
 
 These are the configuration options on the getSecretAsString and getSecretAsJSON methods:
 
-* id - id of secret
-* versionId - version id of the secret
-* versionStage - version stage of the secret
+* All keys from SecretsManager.GetSecretValueRequest
 * region (optional) - region to fetch secret from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the secret. Defaults to 0 (forever) or defaultTTL if specified in the constructor
-* cacheKey (optional) - key used for caching. Default: value of name
+* cacheKey (optional) - key used for caching. Default: SecretId
 
 ### Examples
 
@@ -74,22 +72,67 @@ const secretsManagerCache = new SecretsManagerCache({ region: 'eu-west-1' })
 
 const foo = async () => {
    // retrieved and cached forever
-  const myValue = await secretsManagerCache.getSecretAsString({ id: 'my-secret' })
+  const myValue = await secretsManagerCache.getSecretAsString({ SecretId: 'my-secret' })
 
   secretsManagerCache.setDefaultTTL(10)
    // cached for 10 seconds
-  const anotherValue = await secretsManagerCache.getSecretAsString({ id: 'my-other-secret' })
+  const anotherValue = await secretsManagerCache.getSecretAsString({ SecretId: 'my-other-secret' })
 
-  // retrieved from 'us-east-2', cached for 20 seconds using the key 'coolKey'
-  const thirdValue = await secretsManagerCache.getSecretAsString({ id: 'third-secret', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey'})
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'coolKey'
+  const thirdValue = await secretsManagerCache.getSecretAsString({ SecretId: 'third-secret', ttl: 1200, region: 'us-east-2', cacheKey: 'coolKey' })
 
   // no request is made to SecretsManager since this is cached
-  await secretsManagerCache.getSecretAsString({ id: 'my-secret'})
+  await secretsManagerCache.getSecretAsString({ SecretId: 'my-secret'})
 
   interface MyData {
     a: number;
     b: string;
   }
-  const jsonValue = await secretsManagerCache.getSecretAsJSON<MyData>({ id: 'fourth-secret' })
+  const jsonValue = await secretsManagerCache.getSecretAsJSON<MyData>({ SecretId: 'fourth-secret' })
+}
+```
+
+## KMSCache
+
+KMSCache can decrypt and cache cipher texts. Two method are available:
+
+* decrypt - decrypts a cipher text and returns the value as string
+* decryptAsJSON - decrypts a cipher text and returns it as JSON. You can specify the interface as which the value should be returned
+
+These are the configuration options on the decrypt and decryptAsJSON methods:
+
+* All keys from KMS.DecryptRequest
+* region (optional) - region to fetch secret from. Defaults to region set in constructor
+* ttl (optional) - ttl to use when caching the secret. Defaults to 0 (forever) or defaultTTL if specified in the constructor
+* cacheKey (optional) - key used for caching. Default: CiphertextBlob
+
+### Examples
+
+The below examples do not use real CiphertextBlobs but just dummy values.
+
+```typescript
+import { KMSCache } from '@enfo/aws-secrets'
+
+const kmsCache = new KMSCache({ region: 'eu-west-1' })
+
+const foo = async () => {
+   // retrieved and cached forever
+  const myValue = await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIa...==', 'base64') })
+
+  kmsCache.setDefaultTTL(10)
+   // cached for 10 seconds
+  const anotherValue = await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIb...==', 'base64') })
+
+  // retrieved from 'us-east-2', cached for 20 minutes using the key 'thirdValue'
+  const thirdValue = await kmsCache.decrypt({ Buffer.from('AQIc...==', 'base64'), ttl: 1200, region: 'us-east-2', cacheKey: 'thirdValue' })
+
+  // no request is made to KMS since this is cached from the first request
+  await kmsCache.decrypt({ CiphertextBlob: Buffer.from('AQIa...==', 'base64') })
+
+  interface MyData {
+    a: number;
+    b: string;
+  }
+  const jsonValue = await kmsCache.decryptAsJSON<MyData>({ CiphertextBlob: Buffer.from('AQId...==', 'base64') })
 }
 ```

@@ -1,20 +1,14 @@
-import { getSecretValue } from '@aws/secretsmanager';
-import { cache } from '@helpers/cache';
+import { GetSecretValueRequest as SMGetSecretValueRequest } from 'aws-sdk/clients/secretsmanager';
+
+import { getSecretValue } from '@aws/secretsManager';
+import { Cache, CacheParameters } from './cache';
 
 /**
  * Parameters when getting a secret
  */
-export interface GetSecretRequest {
+export interface GetSecretRequest extends SMGetSecretValueRequest {
   /**
-   * ID of SecretsManager secret
-   */
-  id: string;
-
-  versionId?: string;
-
-  versionStage?: string;
-  /**
-   * Key to use for caching. Default: name
+   * Key to use for caching. Default: SecretId
    */
   cacheKey?: string;
   /**
@@ -30,32 +24,20 @@ export interface GetSecretRequest {
 /**
  * Parameters used to create a new SecretsManagerCache
  */
-export interface SecretsManagerCacheParameters {
-  /**
-   * Region to be used
-   */
-  region: string;
-  /**
-   * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
-   */
-  defaultTTL?: number;
-}
+export type SecretsManagerCacheParameters = CacheParameters
 
 /**
  * SecretsManagerCache retrieves and caches secrets from SecretsManager
  */
-export class SecretsManagerCache {
-  private region: string;
-  private defaultTTL: number
+export class SecretsManagerCache extends Cache {
   /**
    * Creates a new SecretsManagerCache instance
    * @param params
    * See interface definition
    */
+  // eslint-disable-next-line no-useless-constructor
   constructor (params: SecretsManagerCacheParameters) {
-    const { region, defaultTTL = 0 } = params;
-    this.region = region;
-    this.defaultTTL = defaultTTL;
+    super(params);
   }
 
   /**
@@ -64,34 +46,16 @@ export class SecretsManagerCache {
    * See interface definition
    */
   public async getSecretAsString (params: GetSecretRequest): Promise<string> {
-    const { id, versionId, versionStage, region = this.region, ttl = this.defaultTTL, cacheKey = id } = params;
-    const cachedValue = cache.get<string>(cacheKey);
-    if (cachedValue) {
-      return cachedValue;
-    }
-
-    const value = await getSecretValue(region, {
-      SecretId: id,
-      VersionId: versionId,
-      VersionStage: versionStage
+    const { SecretId, region = this.region, ttl, cacheKey = SecretId, ...rest } = params;
+    return await this.getAndCache<string>({
+      cacheKey,
+      noValueFoundMessage: 'No value found for secret',
+      ttl,
+      fun: () => getSecretValue(region, {
+        SecretId,
+        ...rest
+      })
     });
-    if (!value) {
-      throw new Error('No value found for secret');
-    }
-    cache.set<string>(cacheKey, value, ttl);
-    return value;
-  }
-
-  /**
-   * Retrieves and caches a secret. The value will be parsed as JSON
-   * @param params
-   * See interface definition
-   * @deprecated
-   * Use getSecretAsJSON instead. This method has a spelling mistake and will be removed in the next major release.
-   */
-  public async getSecretasJSON <T> (params: GetSecretRequest): Promise<T> {
-    const value = await this.getSecretAsString(params);
-    return JSON.parse(value) as T;
   }
 
   /**
@@ -99,40 +63,8 @@ export class SecretsManagerCache {
    * @param params
    * See interface definition
    */
-  public async getSecretAsJSON<T> (params: GetSecretRequest): Promise<T> { // code duplicated from above, the deprecation tag was inherited
+  public async getSecretAsJSON<T> (params: GetSecretRequest): Promise<T> {
     const value = await this.getSecretAsString(params);
     return JSON.parse(value) as T;
-  }
-
-  /**
-   * Returns current region
-   */
-  public getRegion (): string {
-    return this.region;
-  }
-
-  /**
-   * Sets the region
-   * @param region
-   * Region as string. For example 'eu-west-1'
-   */
-  public setRegion (region: string): void {
-    this.region = region;
-  }
-
-  /**
-   * Returns the default TTL
-   */
-  public getDefaultTTL (): number {
-    return this.defaultTTL;
-  }
-
-  /**
-   * Sets the default TTL
-   * @param ttl
-   * TTL as a number in seconds
-   */
-  public setDefaultTTL (ttl: number): void {
-    this.defaultTTL = ttl;
   }
 }
