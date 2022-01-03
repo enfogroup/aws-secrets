@@ -41,7 +41,7 @@ export interface GetAndCacheParameters<T> {
  */
 export class Cache {
   protected region: string;
-  protected defaultTTL: number
+  protected defaultTTL: number;
   /**
    * Creates a new instance
    * @param params
