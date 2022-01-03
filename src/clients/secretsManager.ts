@@ -8,7 +8,7 @@ import { Cache, CacheParameters } from './cache';
  */
 export interface GetSecretRequest extends SMGetSecretValueRequest {
   /**
-   * Key to use for caching. Default: Id
+   * Key to use for caching. Default: SecretId
    */
   cacheKey?: string;
   /**
