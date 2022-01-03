@@ -18,7 +18,9 @@
   "keywords": [
     "aws",
     "ssm",
-    "secrets"
+    "kms",
+    "secrets",
+    "caching"
   ],
   "author": "Urban Pettersson",
   "license": "MIT",
