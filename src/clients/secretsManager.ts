@@ -1,4 +1,4 @@
-import { GetSecretValueRequest as SMGetSecretValueRequest } from 'aws-sdk/clients/secretsmanager';
+import SecretsManager, { GetSecretValueRequest as SMGetSecretValueRequest } from 'aws-sdk/clients/secretsmanager';
 
 import { getSecretValue } from '@aws/secretsManager';
 import { Cache, CacheParameters } from './cache';
@@ -24,12 +24,12 @@ export interface GetSecretRequest extends SMGetSecretValueRequest {
 /**
  * Parameters used to create a new SecretsManagerCache
  */
-export type SecretsManagerCacheParameters = CacheParameters
+export type SecretsManagerCacheParameters = CacheParameters<SecretsManager>
 
 /**
  * SecretsManagerCache retrieves and caches secrets from SecretsManager
  */
-export class SecretsManagerCache extends Cache {
+export class SecretsManagerCache extends Cache<SecretsManager> {
   /**
    * Creates a new SecretsManagerCache instance
    * @param params
@@ -54,7 +54,7 @@ export class SecretsManagerCache extends Cache {
       fun: () => getSecretValue(region, {
         SecretId,
         ...rest
-      })
+      }, this.wrapper)
     });
   }
 

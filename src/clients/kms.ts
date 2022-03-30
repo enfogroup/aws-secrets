@@ -1,5 +1,6 @@
+import KMS, { DecryptRequest as KMSDecryptRequest } from 'aws-sdk/clients/kms';
+
 import { decrypt } from '@aws/kms';
-import { DecryptRequest as KMSDecryptRequest } from 'aws-sdk/clients/kms';
 import { Cache, CacheParameters } from './cache';
 
 /**
@@ -23,12 +24,12 @@ export interface DecryptRequest extends KMSDecryptRequest {
 /**
  * Parameters used to create a new KMSCache
  */
-export type KMSCacheParameters = CacheParameters
+export type KMSCacheParameters = CacheParameters<KMS>
 
 /**
  * KMSCache decrypts and cached data encrypted using KMS
  */
-export class KMSCache extends Cache {
+export class KMSCache extends Cache<KMS> {
   /**
    * Creates a new KMSCache instance
    * @param params
@@ -54,7 +55,7 @@ export class KMSCache extends Cache {
         const value = await decrypt(region, {
           CiphertextBlob,
           ...rest
-        });
+        }, this.wrapper);
         if (!value) {
           return value;
         }

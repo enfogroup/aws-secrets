@@ -1,4 +1,4 @@
-import { GetParameterRequest as SSMGetParameterRequest } from 'aws-sdk/clients/ssm';
+import SSM, { GetParameterRequest as SSMGetParameterRequest } from 'aws-sdk/clients/ssm';
 
 import { getParameter } from '@aws/ssm';
 import { Cache, CacheParameters } from './cache';
@@ -24,12 +24,12 @@ export interface GetParameterRequest extends Omit<SSMGetParameterRequest, 'WithD
 /**
  * Parameters used to create a new SSMCache
  */
-export type SSMCacheParameters = CacheParameters
+export type SSMCacheParameters = CacheParameters<SSM>
 
 /**
  * SSMCache retrieves and caches parameters from SSM
  */
-export class SSMCache extends Cache {
+export class SSMCache extends Cache<SSM> {
   /**
    * Creates a new SSMCache instance
    * @param params
@@ -51,7 +51,7 @@ export class SSMCache extends Cache {
       cacheKey,
       ttl,
       noValueFoundMessage: 'No value found for parameter',
-      fun: () => getParameter(region, Name)
+      fun: () => getParameter(region, Name, this.wrapper)
     });
   }
 }
