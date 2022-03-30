@@ -16,6 +16,22 @@ This package exposes wrappers for three AWS secrets services: SSMCache, SecretsM
 
 * region - region from which the values should be retrieved
 * defaultTTL - optional default TTL to use on all requests. Defaults to 0 which means a value will be cached for as long as the node process lives
+* clientWrapper - optional function which will be applied to all clients used to fetch data from AWS. Mainly intended for X-Ray support
+
+## X-Ray support
+
+This package will create regional AWS clients in order to access data. The clientWrapper function can be used to apply captureAWSClient to all clients, thus generating X-Ray traces. Example:
+
+```typescript
+import { SSMCache } from '@enfo/aws-secrets'
+import { captureAWSClient } from 'aws-xray-sdk'
+
+const ssmCache = new SSMCache({ region: 'eu-west-1', clientWrapper: captureAWSClient })
+
+const foo = async () => {
+  const myParameter = await ssmCache.getParameter({ Name: 'my-parameter' })
+}
+```
 
 ## SSMCache
 
