@@ -100,4 +100,17 @@ describe('ssm', () => {
       checkAllMocksCalled([getParameterMock], 1);
     });
   });
+
+  describe('getStringListParameter', () => {
+    it('should split on ","', async () => {
+      const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('abc,def,ghi');
+      const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      const output = await instance.getStringListParameter({ Name: 'my-list-parameter' });
+
+      expect(output).toEqual(['abc', 'def', 'ghi']);
+      expect(getParameterMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([getParameterMock], 1);
+    });
+  });
 });
