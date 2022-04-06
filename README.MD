@@ -35,7 +35,7 @@ const foo = async () => {
 
 ## SSMCache
 
-SSMCache can retrieve and cache parameters from SSM. Parameters of type String and SecureString are supported. These are the configuration options on the getParameter method:
+SSMCache can retrieve and cache parameters from SSM. Parameters of type String, SecureString and StringList are supported. These are the configuration options on the getParameter and getStringListParameter method:
 
 * All parameters from SSM.GetParameterRequest except WithDecryption which is set to true
 * region (optional) - region to fetch parameter from. Defaults to region set in constructor
@@ -52,6 +52,9 @@ const ssmCache = new SSMCache({ region: 'eu-west-1' })
 const foo = async () => {
    // retrieved and cached forever
   const myParameter = await ssmCache.getParameter({ Name: 'my-parameter' })
+
+  // @enfo/aws-secrets handles the splitting on ","
+  const myListParameter = await ssmCache.getStringListParameter({ Name: 'my-list-parameter' })
 
   ssmCache.setDefaultTTL(10)
    // cached for 10 seconds
