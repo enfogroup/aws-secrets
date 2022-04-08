@@ -41,7 +41,7 @@ export class SSMCache extends Cache<SSM> {
   }
 
   /**
-   * Retrieves and caches a parameter
+   * Retrieves and caches a String or SecureString parameter
    * @param params
    * See interface definition
    */
@@ -53,5 +53,14 @@ export class SSMCache extends Cache<SSM> {
       noValueFoundMessage: 'No value found for parameter',
       fun: () => getParameter(region, Name, this.wrapper)
     });
+  }
+
+  /**
+   * Retrieves and caches a StringList parameter
+   * @param params
+   * See interface definition
+   */
+  public async getStringListParameter (params: GetParameterRequest): Promise<string[]> {
+    return this.getParameter(params).then((value) => value.split(','));
   }
 }
