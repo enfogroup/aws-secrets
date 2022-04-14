@@ -1,4 +1,4 @@
-import SecretsManager, { GetSecretValueRequest as SMGetSecretValueRequest } from 'aws-sdk/clients/secretsmanager';
+import * as SecretsManager from 'aws-sdk/clients/secretsmanager';
 
 import { getSecretValue } from '@aws/secretsManager';
 import { Cache, CacheParameters } from './cache';
@@ -6,7 +6,7 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a secret
  */
-export interface GetSecretRequest extends SMGetSecretValueRequest {
+export interface GetSecretRequest extends SecretsManager.GetSecretValueRequest {
   /**
    * Key to use for caching. Default: SecretId
    */

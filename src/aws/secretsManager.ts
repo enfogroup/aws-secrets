@@ -1,6 +1,6 @@
 // istanbul ignore file
 
-import SecretsManager from 'aws-sdk/clients/secretsmanager';
+import * as SecretsManager from 'aws-sdk/clients/secretsmanager';
 
 import { WrapperFunction } from '@clients/cache';
 

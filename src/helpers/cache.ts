@@ -1,4 +1,4 @@
 // istanbul ignore file
-import NodeCache from 'node-cache';
+import * as NodeCache from 'node-cache';
 
 export const cache = new NodeCache();

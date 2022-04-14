@@ -1,4 +1,4 @@
-import KMS, { DecryptRequest as KMSDecryptRequest } from 'aws-sdk/clients/kms';
+import * as KMS from 'aws-sdk/clients/kms';
 
 import { decrypt } from '@aws/kms';
 import { Cache, CacheParameters } from './cache';
@@ -6,7 +6,7 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a parameter
  */
-export interface DecryptRequest extends KMSDecryptRequest {
+export interface DecryptRequest extends KMS.DecryptRequest {
   /**
    * Key to use for caching. Default: string value of CiphertextBlob
    */

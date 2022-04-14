@@ -1,6 +1,6 @@
 // istanbul ignore file
 
-import KMS from 'aws-sdk/clients/kms';
+import * as KMS from 'aws-sdk/clients/kms';
 
 import { WrapperFunction } from '@clients/cache';
 
