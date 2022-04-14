@@ -1,4 +1,4 @@
-import SSM, { GetParameterRequest as SSMGetParameterRequest } from 'aws-sdk/clients/ssm';
+import * as SSM from 'aws-sdk/clients/ssm';
 
 import { getParameter } from '@aws/ssm';
 import { Cache, CacheParameters } from './cache';
@@ -6,7 +6,7 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a parameter
  */
-export interface GetParameterRequest extends Omit<SSMGetParameterRequest, 'WithDecryption'> {
+export interface GetParameterRequest extends Omit<SSM.GetParameterRequest, 'WithDecryption'> {
   /**
    * Key to use for caching. Default: Name
    */

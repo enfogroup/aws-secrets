@@ -1,6 +1,6 @@
 // istanbul ignore file
 
-import SSM from 'aws-sdk/clients/ssm';
+import * as SSM from 'aws-sdk/clients/ssm';
 
 import { WrapperFunction } from '@clients/cache';
 
