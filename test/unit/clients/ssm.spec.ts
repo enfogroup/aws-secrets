@@ -48,14 +48,14 @@ describe('ssm', () => {
 
     it('should respect defaultTTL constructor parameter', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('value-defaultTTL');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getParameter({ Name: 'defaultTTL' });
       jest // forwards time by 20 minutes. 1200 > 1000
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.getParameter({ Name: 'defaultTTL' });
 
@@ -65,14 +65,14 @@ describe('ssm', () => {
 
     it('should pick TTL parameter over defaultTTL', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const getParameterMock = jest.spyOn(ssmHelper, 'getParameter').mockResolvedValue('value-defaultTTL');
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getParameter({ Name: 'TTL', ttl: 1300 });
       jest // forwards time by 20 minutes. 1200 < 1300
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.getParameter({ Name: 'TTL' });
 
