@@ -48,14 +48,14 @@ describe('secretsmanager', () => {
 
     it('should respect defaultTTL constructor parameter', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('value-defaultTTL');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getSecretAsString({ SecretId: 'defaultTTL' });
       jest // forwards time by 20 minutes. 1200 > 1000
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.getSecretAsString({ SecretId: 'defaultTTL' });
 
@@ -65,14 +65,14 @@ describe('secretsmanager', () => {
 
     it('should pick TTL parameter over defaultTTL', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const getSecretMock = jest.spyOn(smHelper, 'getSecretValue').mockResolvedValue('value-defaultTTL');
       const instance = new SecretsManagerCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getSecretAsString({ SecretId: 'TTL', ttl: 1300 });
       jest // forwards time by 20 minutes. 1200 < 1300
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.getSecretAsString({ SecretId: 'TTL' });
 

@@ -48,14 +48,14 @@ describe('kms', () => {
 
     it('should respect defaultTTL constructor parameter', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('value-defaultTTL');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.decrypt({ cacheKey: 'defaultTTL', CiphertextBlob: 'something' });
       jest // forwards time by 20 minutes. 1200 > 1000
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.decrypt({ CiphertextBlob: 'defaultTTL' });
 
@@ -65,14 +65,14 @@ describe('kms', () => {
 
     it('should pick TTL parameter over defaultTTL', async () => {
       jest
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
       const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('value-defaultTTL');
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.decrypt({ ttl: 1300, CiphertextBlob: 'TTL' });
       jest // forwards time by 20 minutes. 1200 < 1300
-        .useFakeTimers('modern')
+        .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:20:00').getTime());
       const output = await instance.decrypt({ CiphertextBlob: 'TTL' });
 
