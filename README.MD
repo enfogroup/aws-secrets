@@ -77,7 +77,7 @@ const foo = async () => {
   // @enfo/aws-secrets handles the splitting on ","
   const myListParameter = await ssmCache.getStringListParameter({ Name: 'my-list-parameter' })
   const allPathResponse = await ssmCache.getParametersByPath({ Path: '/a', getAll: true }) // responds with a list of strings
-  const paginatedPathResponse = await ssmCache.getParametersByPath({ Path: '/a' }) // responds with a SSM.GetParametersByPathRequest object
+  const paginatedPathResponse = await ssmCache.getParametersByPath({ Path: '/b' }) // responds with a SSM.GetParametersByPathRequest object
 
   ssmCache.setDefaultTTL(10)
    // cached for 10 seconds
