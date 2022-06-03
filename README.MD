@@ -35,12 +35,33 @@ const foo = async () => {
 
 ## SSMCache
 
-SSMCache can retrieve and cache parameters from SSM. Parameters of type String, SecureString and StringList are supported. These are the configuration options on the getParameter and getStringListParameter method:
+SSMCache can retrieve and cache parameters from SSM. Parameters of type String, SecureString and StringList are supported. Three methods for getting parameters are available:
+
+* getParameter - Returns value for a specific parameter
+* getStringListParameter - Returns value for a specific StringList parameter and splits on ","
+* getParametersByPath - Returns parameters based on path. This method is overloaded and supports getting all parameters or responding with an AWS pagination response. The cacheKey on this method is questionable and should probably be set by the client making the request
+
+These are the configuration options on the getParameter and getStringListParameter method:
 
 * All parameters from SSM.GetParameterRequest except WithDecryption which is set to true
 * region (optional) - region to fetch parameter from. Defaults to region set in constructor
 * ttl (optional) - ttl to use when caching the parameter. Defaults to 0 (forever) or defaultTTL if specified in the constructor
 * cacheKey (optional) - key used for caching. Default: Name
+
+These are the configuration options on the getParametersByPath method when getting all parameters
+
+* All parameters from SSM.GetParametersByPath except MaxResults, NextToken and WithDecryption which is set to true
+* getAll - parameter indicating that all parameters should be returned. Must be set to true
+* region (optional) - region to fetch parameter from. Defaults to region set in constructor
+* ttl (optional) - ttl to use when caching the parameter. Defaults to 0 (forever) or defaultTTL if specified in the constructor
+* cacheKey (optional) - key used for caching. Default: Path
+
+These are the configuration options on the getParametersByPath method when getting a paginated response
+
+* All parameters from SSM.GetParametersByPath except WithDecryption which is set to true
+* region (optional) - region to fetch parameter from. Defaults to region set in constructor
+* ttl (optional) - ttl to use when caching the parameter. Defaults to 0 (forever) or defaultTTL if specified in the constructor
+* cacheKey (optional) - key used for caching. Default: Path + NextToken (if present) 
 
 ### Examples
 
@@ -55,6 +76,8 @@ const foo = async () => {
 
   // @enfo/aws-secrets handles the splitting on ","
   const myListParameter = await ssmCache.getStringListParameter({ Name: 'my-list-parameter' })
+  const allPathResponse = await ssmCache.getParametersByPath({ Path: '/a', getAll: true }) // responds with a list of strings
+  const paginatedPathResponse = await ssmCache.getParametersByPath({ Path: '/a' }) // responds with a SSM.GetParametersByPathRequest object
 
   ssmCache.setDefaultTTL(10)
    // cached for 10 seconds
