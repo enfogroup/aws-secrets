@@ -113,4 +113,58 @@ describe('ssm', () => {
       checkAllMocksCalled([getParameterMock], 1);
     });
   });
+
+  describe('getParametersByPath', () => {
+    it('should return paginated results', async () => {
+      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath').mockResolvedValue({ Parameters: [], NextToken: 'meow' });
+      const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      const output = await instance.getParametersByPath({ Path: '/a/b' });
+
+      expect(output).toEqual({ Parameters: [], NextToken: 'meow' });
+      expect(getParametersByPathMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([getParametersByPathMock], 1);
+    });
+
+    it('should be possible to override cacheKey when getting paginated results', async () => {
+      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
+        .mockResolvedValueOnce({ Parameters: [], NextToken: 'meow' })
+        .mockResolvedValueOnce({ Parameters: [], NextToken: 'banana' });
+      const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      await instance.getParametersByPath({ Path: '/a', cacheKey: 'path-paginated' });
+      const output = await instance.getParametersByPath({ Path: '/a/b', cacheKey: 'path-paginated' });
+
+      expect(output).toEqual({ Parameters: [], NextToken: 'meow' });
+      expect(getParametersByPathMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([getParametersByPathMock], 1);
+    });
+
+    it('should return all results', async () => {
+      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'hello' }, { Value: 'there' }], NextToken: 'meow' })
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'friend' }] });
+      const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      const output = await instance.getParametersByPath({ Path: '/a/b', getAll: true });
+
+      expect(output).toEqual(['hello', 'there', 'friend']);
+      expect(getParametersByPathMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([getParametersByPathMock], 2);
+    });
+
+    it('should be possible to override cacheKey when getting all results', async () => {
+      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'first' }] })
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'nope' }] });
+      const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      await instance.getParametersByPath({ Path: '/a', cacheKey: 'path-all', getAll: true });
+      const output = await instance.getParametersByPath({ Path: '/a/b', cacheKey: 'path-all', getAll: true });
+
+      expect(output).toEqual(['first']);
+      expect(getParametersByPathMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([getParametersByPathMock], 1);
+    });
+  });
 });
