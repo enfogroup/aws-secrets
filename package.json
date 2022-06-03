@@ -23,6 +23,7 @@
     "ssm",
     "kms",
     "secrets",
+    "parameters",
     "caching"
   ],
   "author": "Urban Pettersson",
