@@ -1,23 +1,16 @@
 // istanbul ignore file
 
-import * as SecretsManager from 'aws-sdk/clients/secretsmanager';
+import { GetSecretValueCommand, GetSecretValueCommandInput, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
-import { WrapperFunction } from '@clients/cache';
-
-const clients: Record<string, SecretsManager> = {};
+const clients: Record<string, SecretsManagerClient> = {};
 /**
  * Returns a SecretsManager client
  * @param region
  * Region for which the client should make requests
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getClient = (region: string, wrapper?: WrapperFunction<SecretsManager>): SecretsManager => {
+export const getClient = (region: string): SecretsManagerClient => {
   if (!clients[region]) {
-    clients[region] = new SecretsManager({ region });
-    if (wrapper) {
-      clients[region] = wrapper(clients[region]);
-    }
+    clients[region] = new SecretsManagerClient({ region });
   }
   return clients[region];
 };
@@ -26,13 +19,12 @@ export const getClient = (region: string, wrapper?: WrapperFunction<SecretsManag
  * Retrieves a secret from SecretsManager
  * @param region
  * AWS region
- * @param params
+ * @param input
  * See interface definition
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getSecretValue = async (region: string, params: SecretsManager.GetSecretValueRequest, wrapper?: WrapperFunction<SecretsManager>): Promise<string | undefined> => {
-  const client = getClient(region, wrapper);
-  const output = await client.getSecretValue(params).promise();
+export const getSecretValue = async (region: string, input: GetSecretValueCommandInput): Promise<string | undefined> => {
+  const client = getClient(region);
+  const command = new GetSecretValueCommand(input);
+  const output = await client.send(command);
   return output.SecretString;
 };
