@@ -1,4 +1,4 @@
-import * as KMS from 'aws-sdk/clients/kms';
+import { DecryptCommandInput } from '@aws-sdk/client-kms';
 
 import { decrypt } from '@aws/kms';
 import { Cache, CacheParameters } from './cache';
@@ -6,7 +6,11 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a parameter
  */
-export interface DecryptRequest extends KMS.DecryptRequest {
+export interface DecryptRequest extends Omit<DecryptCommandInput, 'CiphertextBlob'> {
+  /**
+   * Ciphertext to be decrypted. The blob includes metadata.
+   */
+  CiphertextBlob: Uint8Array | string
   /**
    * Key to use for caching. Default: string value of CiphertextBlob
    */
@@ -24,12 +28,12 @@ export interface DecryptRequest extends KMS.DecryptRequest {
 /**
  * Parameters used to create a new KMSCache
  */
-export type KMSCacheParameters = CacheParameters<KMS>
+export type KMSCacheParameters = CacheParameters
 
 /**
  * KMSCache decrypts and cached data encrypted using KMS
  */
-export class KMSCache extends Cache<KMS> {
+export class KMSCache extends Cache {
   /**
    * Creates a new KMSCache instance
    * @param params
@@ -46,20 +50,21 @@ export class KMSCache extends Cache<KMS> {
    * See interface definition
    */
   public async decrypt (params: DecryptRequest): Promise<string> {
-    const { CiphertextBlob, region = this.region, ttl, cacheKey = CiphertextBlob.toString(), ...rest } = params;
+    const blob = typeof params.CiphertextBlob === 'string' ? new TextEncoder().encode(params.CiphertextBlob) : params.CiphertextBlob;
+    const { CiphertextBlob: _, region = this.region, ttl, cacheKey = blob.toString(), ...rest } = params;
     return this.getAndCache({
       cacheKey,
       ttl,
       noValueFoundMessage: 'No value found in CiphertextBlob',
       fun: async () => {
         const value = await decrypt(region, {
-          CiphertextBlob,
+          CiphertextBlob: blob,
           ...rest
-        }, this.wrapper);
+        });
         if (!value) {
           return value;
         }
-        return value.toString();
+        return new TextDecoder('utf-8').decode(value);
       }
     });
   }

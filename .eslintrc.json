@@ -33,5 +33,8 @@
                 "no-undef": "off"
             }
         }
+    ],
+    "ignorePatterns": [
+      "lib/**/*.ts"
     ]
 }

@@ -1,4 +1,4 @@
-import * as SecretsManager from 'aws-sdk/clients/secretsmanager';
+import { GetSecretValueCommandInput } from '@aws-sdk/client-secrets-manager';
 
 import { getSecretValue } from '@aws/secretsManager';
 import { Cache, CacheParameters } from './cache';
@@ -6,7 +6,13 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a secret
  */
-export interface GetSecretRequest extends SecretsManager.GetSecretValueRequest {
+export interface GetSecretRequest extends Omit<GetSecretValueCommandInput, 'SecretId'> {
+  /**
+   * The ARN or name of the secret to retrieve.
+   * For an ARN, we recommend that you specify a complete ARN rather
+   * than a partial ARN. See https://docs.aws.amazon.com/secretsmanager/latest/userguide/troubleshoot.html#ARN_secretnamehyphen
+   */
+  SecretId: string
   /**
    * Key to use for caching. Default: SecretId
    */
@@ -24,12 +30,12 @@ export interface GetSecretRequest extends SecretsManager.GetSecretValueRequest {
 /**
  * Parameters used to create a new SecretsManagerCache
  */
-export type SecretsManagerCacheParameters = CacheParameters<SecretsManager>
+export type SecretsManagerCacheParameters = CacheParameters
 
 /**
  * SecretsManagerCache retrieves and caches secrets from SecretsManager
  */
-export class SecretsManagerCache extends Cache<SecretsManager> {
+export class SecretsManagerCache extends Cache {
   /**
    * Creates a new SecretsManagerCache instance
    * @param params
@@ -54,7 +60,7 @@ export class SecretsManagerCache extends Cache<SecretsManager> {
       fun: () => getSecretValue(region, {
         SecretId,
         ...rest
-      }, this.wrapper)
+      })
     });
   }
 

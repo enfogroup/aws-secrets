@@ -1,5 +1,6 @@
 /* eslint-disable no-dupe-class-members */
-import * as SSM from 'aws-sdk/clients/ssm';
+
+import { GetParameterCommandInput, GetParametersByPathCommandInput, GetParametersByPathCommandOutput } from '@aws-sdk/client-ssm';
 
 import { getParameter, getPaginatedParametersByPath, getAllParametersByPath } from '@aws/ssm';
 import { Cache, CacheParameters } from './cache';
@@ -7,7 +8,14 @@ import { Cache, CacheParameters } from './cache';
 /**
  * Parameters when getting a parameter
  */
-export interface GetParameterRequest extends Omit<SSM.GetParameterRequest, 'WithDecryption'> {
+export type GetParameterRequest = Omit<GetParameterCommandInput, 'WithDecryption' | 'Name'> &
+{
+  /**
+   * The name of the parameter you want to query.
+   * To query by parameter label, use "Name": "name:label".
+   * To query by parameter version, use "Name": "name:version".
+   */
+  Name: string
   /**
    * Key to use for caching. Default: Name
    */
@@ -25,7 +33,15 @@ export interface GetParameterRequest extends Omit<SSM.GetParameterRequest, 'With
 /**
  * Parameters when getting parameters by path, returning paginated values
  */
-export interface GetPaginatedParametersByPathRequest extends Omit<SSM.GetParametersByPathRequest, 'WithDecryption'> {
+export interface GetPaginatedParametersByPathRequest extends Omit<GetParametersByPathCommandInput, 'WithDecryption' | 'Path'> {
+  /**
+   * The hierarchy for the parameter. Hierarchies start with a forward slash (/). The hierarchy
+   * is the parameter name except the last part of the parameter. For the API call to succeed, the
+   * last part of the parameter name can't be in the path. A parameter name hierarchy can have a
+   * maximum of 15 levels. Here is an example of a hierarchy:
+   * /Finance/Prod/IAD/WinServ2016/license33
+   */
+  Path: string
   /**
    * Key to use for caching. Default: Path + NextToken (if present)
    * This cache key is not optimal since more parameters affect the request. Consider defining your own cache key
@@ -61,12 +77,12 @@ export type GetParametersByPathRequest = GetPaginatedParametersByPathRequest | G
 /**
  * Parameters used to create a new SSMCache
  */
-export type SSMCacheParameters = CacheParameters<SSM>
+export type SSMCacheParameters = CacheParameters
 
 /**
  * SSMCache retrieves and caches parameters from SSM
  */
-export class SSMCache extends Cache<SSM> {
+export class SSMCache extends Cache {
   /**
    * Creates a new SSMCache instance
    * @param params
@@ -88,7 +104,7 @@ export class SSMCache extends Cache<SSM> {
       cacheKey,
       ttl,
       noValueFoundMessage: 'No value found for parameter',
-      fun: () => getParameter(region, Name, this.wrapper)
+      fun: () => getParameter(region, Name)
     });
   }
 
@@ -103,12 +119,12 @@ export class SSMCache extends Cache<SSM> {
 
   /**
    * Retrieves and caches parameters by path
-   * Light wrapper around getParametersByPath from the aws-sdk
+   * Light wrapper around getParametersByPath from the AWS SDK
    * Returns a paginated response
    * @param params
    * See interface definition
    */
-  getParametersByPath(params: GetPaginatedParametersByPathRequest): Promise<SSM.GetParametersByPathResult>;
+  getParametersByPath(params: GetPaginatedParametersByPathRequest): Promise<GetParametersByPathCommandOutput>;
   /**
    * Retrieves and caches parameters by path
    * Returns all values
@@ -117,14 +133,14 @@ export class SSMCache extends Cache<SSM> {
    */
   getParametersByPath(params: GetAllParametersByPathRequest): Promise<string[]>;
 
-  public async getParametersByPath (params: GetParametersByPathRequest): Promise<SSM.GetParametersByPathResult | string[]> {
+  public async getParametersByPath (params: GetParametersByPathRequest): Promise<GetParametersByPathCommandOutput | string[]> {
     if ('getAll' in params) {
       const { Path, region = this.region, ttl, getAll, ...rest } = params;
       return this.getAndCache({
         cacheKey: params.cacheKey ?? params.Path,
         ttl,
         noValueFoundMessage: 'No parameters found for params',
-        fun: () => getAllParametersByPath(region, { Path, ...rest }, this.wrapper)
+        fun: () => getAllParametersByPath(region, { Path, ...rest })
       });
     } else {
       const { Path, region = this.region, ttl, ...rest } = params;
@@ -132,7 +148,7 @@ export class SSMCache extends Cache<SSM> {
         cacheKey: params.cacheKey ?? (params.Path + params.NextToken),
         ttl,
         noValueFoundMessage: 'No parameters found for params',
-        fun: () => getPaginatedParametersByPath(region, { Path, ...rest }, this.wrapper)
+        fun: () => getPaginatedParametersByPath(region, { Path, ...rest })
       });
     }
   }

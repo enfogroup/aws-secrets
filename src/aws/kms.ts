@@ -1,23 +1,16 @@
 // istanbul ignore file
 
-import * as KMS from 'aws-sdk/clients/kms';
+import { KMSClient, DecryptCommandInput, DecryptCommand } from '@aws-sdk/client-kms';
 
-import { WrapperFunction } from '@clients/cache';
-
-const clients: Record<string, KMS> = {};
+const clients: Record<string, KMSClient> = {};
 /**
  * Returns an KMS client
  * @param region
  * Region for which the client should make requests
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getClient = (region: string, wrapper?: WrapperFunction<KMS>): KMS => {
+export const getClient = (region: string): KMSClient => {
   if (!clients[region]) {
-    clients[region] = new KMS({ region });
-    if (wrapper) {
-      clients[region] = wrapper(clients[region]);
-    }
+    clients[region] = new KMSClient({ region });
   }
   return clients[region];
 };
@@ -26,13 +19,12 @@ export const getClient = (region: string, wrapper?: WrapperFunction<KMS>): KMS =
  * Decrypts a KMS encrypted value
  * @param region
  * AWS region
- * @param params
+ * @param input
  * See interface definition
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const decrypt = async (region: string, params: KMS.DecryptRequest, wrapper?: WrapperFunction<KMS>): Promise<KMS.PlaintextType | undefined> => {
-  const client = getClient(region, wrapper);
-  const output = await client.decrypt(params).promise();
+export const decrypt = async (region: string, input: DecryptCommandInput): Promise<Uint8Array | undefined> => {
+  const client = getClient(region);
+  const command = new DecryptCommand(input);
+  const output = await client.send(command);
   return output?.Plaintext;
 };

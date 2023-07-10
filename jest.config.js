@@ -24,7 +24,8 @@ module.exports = {
   },
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/models/**/*.ts'
+    '!src/models/**/*.ts',
+    '!src/**/index.ts'
   ],
   coverageReporters: [
     'lcov',

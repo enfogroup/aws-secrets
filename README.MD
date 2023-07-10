@@ -1,6 +1,6 @@
 ## Introduction
 
-This package exposes functionality for getting data from SSM, SecretsManager and KMS. All values can be cached for further use.
+This package exposes functionality for getting data from SSM, Secrets Manager and KMS. All values can be cached for further use.
 
 ## Installation
 
@@ -8,7 +8,11 @@ This package exposes functionality for getting data from SSM, SecretsManager and
 npm install @enfo/aws-secrets --save
 ```
 
-The aws-sdk@2.X is a peer dependency and must be installed by you.
+The AWS SDK v3 clients for SSM, Secrets Manager and KMS are all peer dependencies and must be installed by you.
+
+```bash
+npm install @aws-sdk/client-ssm @aws-sdk/client-kms @aws-sdk/client-secrets-manager --save-dev
+```
 
 ## Available caches
 
@@ -16,22 +20,6 @@ This package exposes wrappers for three AWS secrets services: SSMCache, SecretsM
 
 * region - region from which the values should be retrieved
 * defaultTTL - optional default TTL to use on all requests. Defaults to 0 which means a value will be cached for as long as the node process lives
-* clientWrapper - optional function which will be applied to all clients used to fetch data from AWS. Mainly intended for X-Ray support
-
-## X-Ray support
-
-This package will create regional AWS clients in order to access data. The clientWrapper function can be used to apply captureAWSClient to all clients, thus generating X-Ray traces. Example:
-
-```typescript
-import { SSMCache } from '@enfo/aws-secrets'
-import { captureAWSClient } from 'aws-xray-sdk'
-
-const ssmCache = new SSMCache({ region: 'eu-west-1', clientWrapper: captureAWSClient })
-
-const foo = async () => {
-  const myParameter = await ssmCache.getParameter({ Name: 'my-parameter' })
-}
-```
 
 ## SSMCache
 
@@ -77,7 +65,7 @@ const foo = async () => {
   // @enfo/aws-secrets handles the splitting on ","
   const myListParameter = await ssmCache.getStringListParameter({ Name: 'my-list-parameter' })
   const allPathResponse = await ssmCache.getParametersByPath({ Path: '/a', getAll: true }) // responds with a list of strings
-  const paginatedPathResponse = await ssmCache.getParametersByPath({ Path: '/b' }) // responds with a SSM.GetParametersByPathRequest object
+  const paginatedPathResponse = await ssmCache.getParametersByPath({ Path: '/b' }) // responds with a GetParametersByPathCommandOutput object
 
   ssmCache.setDefaultTTL(10)
    // cached for 10 seconds
