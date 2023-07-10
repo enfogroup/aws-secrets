@@ -32,6 +32,8 @@
   },
   "homepage": "https://github.com/enfogroup/aws-secrets#readme",
   "devDependencies": {
+    "@aws-sdk/client-kms": "^3.366.0",
+    "@aws-sdk/client-ssm": "^3.363.0",
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
     "@types/jest": "^29.5.2",
@@ -54,6 +56,10 @@
   },
   "dependencies": {
     "node-cache": "^5.1.2"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-kms": "^3.366.0",
+    "@aws-sdk/client-ssm": "^3.363.0"
   },
   "files": [
     "lib/*"
