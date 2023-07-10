@@ -1,23 +1,16 @@
 // istanbul ignore file
 
-import * as SSM from 'aws-sdk/clients/ssm';
+import { GetParameterCommand, GetParametersByPathCommand, GetParametersByPathCommandInput, GetParametersByPathCommandOutput, Parameter, SSMClient } from '@aws-sdk/client-ssm';
 
-import { WrapperFunction } from '@clients/cache';
-
-const clients: Record<string, SSM> = {};
+const clients: Record<string, SSMClient> = {};
 /**
  * Returns an SSM client
  * @param region
  * Region for which the client should make requests
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getClient = (region: string, wrapper?: WrapperFunction<SSM>): SSM => {
+export const getClient = (region: string): SSMClient => {
   if (!clients[region]) {
-    clients[region] = new SSM({ region });
-    if (wrapper) {
-      clients[region] = wrapper(clients[region]);
-    }
+    clients[region] = new SSMClient({ region });
   }
   return clients[region];
 };
@@ -28,12 +21,14 @@ export const getClient = (region: string, wrapper?: WrapperFunction<SSM>): SSM =
  * AWS region
  * @param name
  * Name of parameter
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getParameter = async (region: string, name: string, wrapper?: WrapperFunction<SSM>): Promise<string | undefined> => {
-  const client = getClient(region, wrapper);
-  const output = await client.getParameter({ Name: name, WithDecryption: true }).promise();
+export const getParameter = async (region: string, name: string): Promise<string | undefined> => {
+  const client = getClient(region);
+  const command = new GetParameterCommand({
+    Name: name,
+    WithDecryption: true
+  });
+  const output = await client.send(command);
   return output.Parameter?.Value;
 };
 
@@ -41,35 +36,31 @@ export const getParameter = async (region: string, name: string, wrapper?: Wrapp
  * Retrieves SSM parameters by path
  * @param region
  * AWS region
- * @param params
+ * @param input
  * GetParametersByPathRequest object
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getPaginatedParametersByPath = async (region: string, params: SSM.GetParametersByPathRequest, wrapper?: WrapperFunction<SSM>): Promise<SSM.GetParametersByPathResult> => {
-  const client = getClient(region, wrapper);
-  const output = await client.getParametersByPath({ WithDecryption: true, ...params }).promise();
-  return output;
+export const getPaginatedParametersByPath = async (region: string, input: GetParametersByPathCommandInput): Promise<GetParametersByPathCommandOutput> => {
+  const client = getClient(region);
+  const command = new GetParametersByPathCommand({ WithDecryption: true, ...input });
+  return client.send(command);
 };
 
 /**
  * Retrieves SSM parameters by path, returns all values
  * @param region
  * AWS region
- * @param params
+ * @param input
  * GetParametersByPathRequest object
- * @param wrapper
- * Optional wrapper function to execute on all clients
  */
-export const getAllParametersByPath = async (region: string, params: SSM.GetParametersByPathRequest, wrapper?: WrapperFunction<SSM>): Promise<string[]> => {
+export const getAllParametersByPath = async (region: string, input: GetParametersByPathCommandInput): Promise<string[]> => {
   const parameters: string[] = [];
-  let nextToken: SSM.GetParametersByPathResult['NextToken'];
+  let nextToken: GetParametersByPathCommandOutput['NextToken'];
   do {
-    const response = await getPaginatedParametersByPath(region, { NextToken: nextToken, ...params }, wrapper);
+    const response = await getPaginatedParametersByPath(region, { NextToken: nextToken, ...input });
     nextToken = response.NextToken;
 
     const newValues = (response.Parameters ?? [])
-      .reduce((aggregator: string[], value: SSM.Parameter): string[] => {
+      .reduce((aggregator: string[], value: Parameter): string[] => {
         if (value.Value) {
           aggregator.push(value.Value);
         }

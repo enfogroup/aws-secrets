@@ -1,14 +1,9 @@
 import { cache } from '@helpers/cache';
 
 /**
- * Wrapper function which returns the same type as it received
- */
-export type WrapperFunction<T> = (client: T) => T
-
-/**
  * Parameters used to create a new instance
  */
-export interface CacheParameters<T> {
+export interface CacheParameters {
   /**
    * Region to be used
    */
@@ -17,10 +12,6 @@ export interface CacheParameters<T> {
    * Optional default TTL to be used for all requests. Defaults to 0 (infinite caching)
    */
   defaultTTL?: number;
-  /**
-   * Wraps any client used to fetch data. Mainly intended for x-ray support
-   */
-  clientWrapper?: WrapperFunction<T>
 }
 
 /**
@@ -48,20 +39,18 @@ export interface GetAndCacheParameters<T> {
 /**
  * Cache returns cached values or awaits a promise to get one
  */
-export class Cache<T> {
+export class Cache {
   protected region: string;
   protected defaultTTL: number;
-  protected wrapper: WrapperFunction<T> | undefined;
   /**
    * Creates a new instance
    * @param params
    * See interface definition
    */
-  constructor (params: CacheParameters<T>) {
-    const { region, defaultTTL = 0, clientWrapper } = params;
+  constructor (params: CacheParameters) {
+    const { region, defaultTTL = 0 } = params;
     this.region = region;
     this.defaultTTL = defaultTTL;
-    this.wrapper = clientWrapper;
   }
 
   /**
