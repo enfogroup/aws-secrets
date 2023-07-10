@@ -119,7 +119,7 @@ export class SSMCache extends Cache {
 
   /**
    * Retrieves and caches parameters by path
-   * Light wrapper around getParametersByPath from the aws-sdk
+   * Light wrapper around getParametersByPath from the AWS SDK
    * Returns a paginated response
    * @param params
    * See interface definition
