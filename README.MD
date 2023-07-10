@@ -10,6 +10,10 @@ npm install @enfo/aws-secrets --save
 
 The AWS SDK v3 clients for SSM, Secrets Manager and KMS are all peer dependencies and must be installed by you.
 
+```bash
+npm install @aws-sdk/client-ssm @aws-sdk/client-kms @aws-sdk/client-secrets-manager --save-dev
+```
+
 ## Available caches
 
 This package exposes wrappers for three AWS secrets services: SSMCache, SecretsManagerCache and KMSCache. All three are built for retrieving and caching a value. All retrieval methods use extensions of the underlying AWS SDK method. This is the cause for the weird mismatch of camelCase and PascalCase in the request bodies. The caches have the same constructor parameters:
