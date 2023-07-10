@@ -7,6 +7,8 @@ import * as ssmHelper from '@aws/ssm';
 // tools
 import { checkAllMocksCalled } from '@test/tools';
 
+import { GetParametersByPathCommandOutput } from '@aws-sdk/client-ssm';
+
 describe('ssm', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -116,7 +118,7 @@ describe('ssm', () => {
 
   describe('getParametersByPath', () => {
     it('should return paginated results', async () => {
-      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath').mockResolvedValue({ Parameters: [], NextToken: 'meow' });
+      const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath').mockResolvedValue({ Parameters: [], NextToken: 'meow' } as unknown as GetParametersByPathCommandOutput);
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.getParametersByPath({ Path: '/a/b' });
@@ -128,8 +130,8 @@ describe('ssm', () => {
 
     it('should be possible to override cacheKey when getting paginated results', async () => {
       const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
-        .mockResolvedValueOnce({ Parameters: [], NextToken: 'meow' })
-        .mockResolvedValueOnce({ Parameters: [], NextToken: 'banana' });
+        .mockResolvedValueOnce({ Parameters: [], NextToken: 'meow' } as unknown as GetParametersByPathCommandOutput)
+        .mockResolvedValueOnce({ Parameters: [], NextToken: 'banana' } as unknown as GetParametersByPathCommandOutput);
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getParametersByPath({ Path: '/a', cacheKey: 'path-paginated' });
@@ -142,8 +144,8 @@ describe('ssm', () => {
 
     it('should return all results', async () => {
       const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
-        .mockResolvedValueOnce({ Parameters: [{ Value: 'hello' }, { Value: 'there' }], NextToken: 'meow' })
-        .mockResolvedValueOnce({ Parameters: [{ Value: 'friend' }] });
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'hello' }, { Value: 'there' }], NextToken: 'meow' } as unknown as GetParametersByPathCommandOutput)
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'friend' }] } as unknown as GetParametersByPathCommandOutput);
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.getParametersByPath({ Path: '/a/b', getAll: true });
@@ -155,8 +157,8 @@ describe('ssm', () => {
 
     it('should be possible to override cacheKey when getting all results', async () => {
       const getParametersByPathMock = jest.spyOn(ssmHelper, 'getPaginatedParametersByPath')
-        .mockResolvedValueOnce({ Parameters: [{ Value: 'first' }] })
-        .mockResolvedValueOnce({ Parameters: [{ Value: 'nope' }] });
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'first' }] } as unknown as GetParametersByPathCommandOutput)
+        .mockResolvedValueOnce({ Parameters: [{ Value: 'nope' }] } as unknown as GetParametersByPathCommandOutput);
       const instance = new SSMCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.getParametersByPath({ Path: '/a', cacheKey: 'path-all', getAll: true });
