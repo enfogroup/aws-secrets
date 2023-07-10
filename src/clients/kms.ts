@@ -10,7 +10,7 @@ export interface DecryptRequest extends Omit<DecryptCommandInput, 'CiphertextBlo
   /**
    * Ciphertext to be decrypted. The blob includes metadata.
    */
-  CiphertextBlob: Uint8Array
+  CiphertextBlob: Uint8Array | string
   /**
    * Key to use for caching. Default: string value of CiphertextBlob
    */
@@ -50,14 +50,15 @@ export class KMSCache extends Cache {
    * See interface definition
    */
   public async decrypt (params: DecryptRequest): Promise<string> {
-    const { CiphertextBlob, region = this.region, ttl, cacheKey = CiphertextBlob.toString(), ...rest } = params;
+    const blob = typeof params.CiphertextBlob === 'string' ? new TextEncoder().encode(params.CiphertextBlob) : params.CiphertextBlob;
+    const { CiphertextBlob: _, region = this.region, ttl, cacheKey = blob.toString(), ...rest } = params;
     return this.getAndCache({
       cacheKey,
       ttl,
       noValueFoundMessage: 'No value found in CiphertextBlob',
       fun: async () => {
         const value = await decrypt(region, {
-          CiphertextBlob,
+          CiphertextBlob: blob,
           ...rest
         });
         if (!value) {

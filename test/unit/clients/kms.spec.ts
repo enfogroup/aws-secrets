@@ -12,10 +12,12 @@ describe('kms', () => {
     jest.restoreAllMocks();
   });
 
+  const encode = (value: string) => new TextEncoder().encode(value);
+
   // these tests use separate parameter names due to caching reasons
   describe('decrypt', () => {
     it('should return a parameter from eu-west-1', async () => {
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('my-value-1');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('my-value-1'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.decrypt({ CiphertextBlob: 'my-value-1' });
@@ -26,7 +28,7 @@ describe('kms', () => {
     });
 
     it('should return cached data', async () => {
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('ignoreMe!');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('ignoreMe!'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.decrypt({ CiphertextBlob: 'my-value-1' });
@@ -35,8 +37,19 @@ describe('kms', () => {
       checkAllMocksCalled([decryptMock], 0);
     });
 
+    it('should work with array input', async () => {
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('my-value-1'));
+      const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
+
+      const output = await instance.decrypt({ CiphertextBlob: encode('my-value-1') });
+
+      expect(output).toEqual('my-value-1');
+      expect(decryptMock.mock.calls[0][0]).toEqual('eu-west-1');
+      checkAllMocksCalled([decryptMock], 1);
+    });
+
     it('should respect region parameter', async () => {
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('my-value-2');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('my-value-2'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.decrypt({ region: 'us-east-2', CiphertextBlob: 'my-value-2' });
@@ -50,7 +63,7 @@ describe('kms', () => {
       jest
         .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('value-defaultTTL');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('value-defaultTTL'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.decrypt({ cacheKey: 'defaultTTL', CiphertextBlob: 'something' });
@@ -67,7 +80,7 @@ describe('kms', () => {
       jest
         .useFakeTimers()
         .setSystemTime(new Date('2020-10-13T12:00:00').getTime());
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('value-defaultTTL');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('value-defaultTTL'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       await instance.decrypt({ ttl: 1300, CiphertextBlob: 'TTL' });
@@ -81,7 +94,7 @@ describe('kms', () => {
     });
 
     it('should respect cacheKey parameter', async () => {
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue('my-value-4');
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('my-value-4'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
       const output = await instance.decrypt({ CiphertextBlob: 'sharedCached1', cacheKey: 'cacheMe!' });
@@ -109,7 +122,7 @@ describe('kms', () => {
       const data: Stuff = {
         a: 47
       };
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(JSON.stringify(data));
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode(JSON.stringify(data)));
       const instance = new KMSCache({ region: 'eu-west-1' });
 
       const output = await instance.decryptAsJSON<Stuff>({ CiphertextBlob: 'json' });
@@ -117,9 +130,5 @@ describe('kms', () => {
       expect(output).toEqual(data);
       checkAllMocksCalled([decryptMock], 1);
     });
-  });
-
-  describe('enableCiphertextAsKey', () => {
-
   });
 });
