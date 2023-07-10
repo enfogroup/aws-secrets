@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": [],
+    "module": "CommonJS",
     "removeComments": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
@@ -11,19 +12,12 @@
     "noImplicitReturns": true,
     "strictNullChecks": true,
     "strict": true,
-    "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "target": "es2018",
-    "outDir": ".dist",
+    "target": "es2021",
+    "outDir": "lib",
     "baseUrl": "src",
-    "plugins": [
-      {
-        "transform": "typescript-transform-paths",
-        "afterDeclarations": true
-      }
-    ],
     "paths": {
       "@test/*": [
         "../test/*"
@@ -45,7 +39,6 @@
   ],
   "exclude": [
     "node_modules/**/*",
-    ".webpack/**/*",
     "_warmup/**/*",
     ".vscode/**/*"
   ]
