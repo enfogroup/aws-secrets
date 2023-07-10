@@ -1,6 +1,6 @@
 {
   "name": "@enfo/aws-secrets",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "NPM package for getting data from SSM, SecretsManager and KMS. All returned values are cached for further use.",
   "private": false,
   "main": "./lib/index.js",
