@@ -43,7 +43,7 @@
     "aws-sdk": "^2.1048.0",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.6.0",
-    "eslint-config-standard": "^16.0.3",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
