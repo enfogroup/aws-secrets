@@ -64,7 +64,7 @@ export class KMSCache extends Cache {
         if (!value) {
           return value;
         }
-        return value.toString();
+        return new TextDecoder('utf-8').decode(value);
       }
     });
   }

@@ -38,12 +38,12 @@ describe('kms', () => {
     });
 
     it('should work with array input', async () => {
-      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('my-value-1'));
+      const decryptMock = jest.spyOn(kmsHelper, 'decrypt').mockResolvedValue(encode('array-output'));
       const instance = new KMSCache({ region: 'eu-west-1', defaultTTL: 1000 });
 
-      const output = await instance.decrypt({ CiphertextBlob: encode('my-value-1') });
+      const output = await instance.decrypt({ CiphertextBlob: encode('array-input') });
 
-      expect(output).toEqual('my-value-1');
+      expect(output).toEqual('array-output');
       expect(decryptMock.mock.calls[0][0]).toEqual('eu-west-1');
       checkAllMocksCalled([decryptMock], 1);
     });
