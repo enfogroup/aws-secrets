@@ -17,7 +17,7 @@ export type GetParameterRequest = Omit<GetParameterCommandInput, 'WithDecryption
    */
   Name: string
   /**
-   * Key to use for caching. Default: name
+   * Key to use for caching. Default: Name
    */
   cacheKey?: string;
   /**
